@@ -2,9 +2,9 @@
 #include "oled.h"
 #include "uart.h"
 
-#define MAX_BRIGHTNESS 255
-#define CAL_SAMPLE_SIZE 500
-#define CAL_HR_SIZE 400
+#define MAX_BRIGHTNESS      255
+#define CAL_SAMPLE_SIZE     500
+#define CAL_HR_SIZE         400
 
 const u8 BMP_Buf[] = {0xF8,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xF8,0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF,
 0xFF,0x7F,0x3F,0x1F,0x0F,0x07,0x03,0x01};
@@ -90,40 +90,34 @@ void ClearWaves()
 }
 //计算心率
 void Caculate_HR()
-{
-	
+{	
 	int i = 0;
 	int16_t HrValue;
-
 	
-		if( ir_red_data_count >= CAL_HR_SIZE )
-		{
-			if(Function_Select == FUNCTION_ECG )
-				HrValue = CaculateHR_ECG();
-			else
-				HrValue = CaculateHR_PPG();
+	if( ir_red_data_count >= CAL_HR_SIZE )
+	{
+		if(Function_Select == FUNCTION_ECG )
+			HrValue = CaculateHR_ECG();
+		else
+			HrValue = CaculateHR_PPG();
 			
-			sprintf(TempDisplayBuf,"%d  ",HrValue);
-				OLED_ShowString(20,7, ASCII12x8, TempDisplayBuf);	
-//				OLED_ShowString(0,7, ASCII12x8, TempDisplayBuf);	
-//			maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, CAL_SAMPLE_SIZE, 0, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid); 
-//			if( ch_hr_valid == 1)
-//			{
-//				sprintf(TempDisplayBuf,"HR:%d   ",n_heart_rate);
-//				OLED_ShowString(0,7, ASCII12x8, TempDisplayBuf);	
-//			}
-//			else
-//			{
-//				OLED_ShowString(0,7, ASCII12x8, "HR:   ");	
-//			}
-			for(i=100;i<CAL_HR_SIZE;i++)
-			{
-         aun_ir_buffer[i-100]=aun_ir_buffer[i];
-       }
-			ir_red_data_count =300;
-		}
-		
-	
+		sprintf(TempDisplayBuf,"%d  ",HrValue);
+		OLED_ShowString(20,7, ASCII12x8, TempDisplayBuf);	
+//		OLED_ShowString(0,7, ASCII12x8, TempDisplayBuf);	
+//		maxim_heart_rate_and_oxygen_saturation(aun_ir_buffer, CAL_SAMPLE_SIZE, 0, &n_sp02, &ch_spo2_valid, &n_heart_rate, &ch_hr_valid); 
+//		if( ch_hr_valid == 1) {
+//			sprintf(TempDisplayBuf,"HR:%d   ",n_heart_rate);
+//			OLED_ShowString(0,7, ASCII12x8, TempDisplayBuf);	
+//		} else {
+//			OLED_ShowString(0,7, ASCII12x8, "HR:   ");	
+//		}
+
+		for(i=100;i<CAL_HR_SIZE;i++) {
+          aun_ir_buffer[i-100]=aun_ir_buffer[i];
+        }
+
+		ir_red_data_count =300;
+	}
 }
 void KeyPadProcess(void)
 {
@@ -186,6 +180,7 @@ void KeyPadProcess(void)
 			 key_spo2_press = 0;
 		 }
 }
+
 void ShowTemperature(void)
 {
 	static uint8_t ds18b20_count = 0;
@@ -350,31 +345,17 @@ void ShowHeart(u8 show)
 void SetBoardTestMode(uint8_t mode)
 {
 	Function_Select = mode;
-	OLED_ShowString(0,6, ASCII12x8, "       ");	
+	OLED_ShowString(0,6, ASCII12x8, "       ");	 // x, y, ASCII_size, string
 	OLED_ShowString(0,7, ASCII12x8, "       ");	
-	if(Function_Select == FUNCTION_ECG )
-	{
-			OLED_ShowString(48,0, ASCII16x16, "ECG ");	
-	}
-	else if(Function_Select == FUNCTION_PPG )
-	{
-			OLED_ShowString(48,0, ASCII16x16, "PPG ");	
-	}
-	else if(Function_Select == FUNCTION_GSR )
-	{
-			OLED_ShowString(48,0, ASCII16x16, "GSR ");	
-	}
-	else 
-	{
-			OLED_ShowString(48,0, ASCII16x16, "SPo2");	
-	}
-	if(Function_Select == FUNCTION_ECG || Function_Select == FUNCTION_PPG )
-	{
-		ShowHeart(1);
-	}
-	
-	
+
+	if(Function_Select == FUNCTION_ECG )      {  OLED_ShowString(48,0, ASCII16x16, "ECG ");  }
+	else if(Function_Select == FUNCTION_PPG ) {  OLED_ShowString(48,0, ASCII16x16, "PPG ");  }
+	else if(Function_Select == FUNCTION_GSR ) {  OLED_ShowString(48,0, ASCII16x16, "GSR ");  }
+	else                                      {  OLED_ShowString(48,0, ASCII16x16, "SPo2");  }
+
+	if(Function_Select == FUNCTION_ECG || Function_Select == FUNCTION_PPG ) {  ShowHeart(1); }	
 }
+
 /***********************************计算心率************************************************/													
 int16_t GetMax(int16_t * pn_buf,int16_t n_size)
 {
@@ -391,12 +372,12 @@ int16_t GetMax(int16_t * pn_buf,int16_t n_size)
 
 	return Max;
 }
+
 int16_t GetMaxIndex(int16_t * pn_buf,int16_t n_size)
 {
 	int16_t i,MaxIndex = 0;
     if(n_size > 0)
-    {
-        
+    {        
         int16_t ValTemp=pn_buf[0];
         for(i=1;i<n_size;i++)
         {
@@ -410,6 +391,7 @@ int16_t GetMaxIndex(int16_t * pn_buf,int16_t n_size)
     }
 	 return MaxIndex ;
 }
+
 int16_t GetMin(int16_t * pn_buf,int n_size)
 {
 	int16_t i,Min = 0;
@@ -425,6 +407,7 @@ int16_t GetMin(int16_t * pn_buf,int n_size)
 
 	return Min;
 }
+
 int16_t GetAverage(uint32_t * pn_buf,int16_t n_size)
 {
 	int32_t i,sum = 0;
@@ -439,6 +422,7 @@ int16_t GetAverage(uint32_t * pn_buf,int16_t n_size)
 	
 	return sum;
 }
+
 int16_t GetSubArray(int16_t * pn_buf,int16_t n_size,int16_t n_start,int16_t n_len,int16_t * pn_out)
 {
 	int16_t i = 0;
@@ -450,6 +434,14 @@ int16_t GetSubArray(int16_t * pn_buf,int16_t n_size,int16_t n_start,int16_t n_le
     
 	return Len;
 }
+
+/* PPG: PhotoPlethysmoGaphy 光电容积脉搏波描记法
+  * 心率检测技术目前主要以光电容积脉搏波描记法PPG、
+  *                                                                 心电信号法、
+  *                                                                 动脉压力法、
+  *                                                                 图像信号分析
+  * 这几类技术应用最多*/
+
 int16_t CaculateHR_PPG()
 {
 	int16_t i,j,k;
@@ -466,30 +458,23 @@ int16_t CaculateHR_PPG()
 	
 	for(i=0,j=0;i<CAL_HR_SIZE-1;i++)
 	{
-		if( BiaArray[i]*10>thr2)
-    {
-       aun_red_buffer[j++] = 1;
-    }
-		else
-		{
-			aun_red_buffer[j++] = 0;
-		}
+		if( BiaArray[i]*10>thr2) {  aun_red_buffer[j++] = 1;  }
+		else                     {  aun_red_buffer[j++] = 0;  }
 	}
 	
 	for(i=0,k=0;i<j-1;i++)
 	{
-		if (aun_red_buffer[i+1] - aun_red_buffer[i] == 1)
-		{
-			BiaArray[k++] = i;
-		}
+		if (aun_red_buffer[i+1] - aun_red_buffer[i] == 1)  {  BiaArray[k++] = i;  }
 	}
-	if( k > 1 )
-	{
+
+	if( k > 1 ) {
 		meanRR=(BiaArray[k-1]-BiaArray[0])/(k-1);
-    return 6000/meanRR;
+    	return 6000/meanRR;
 	}
+
 	return 0;
 }
+
 int16_t CaculateHR_ECG()
 {
 	int16_t sum1,sum2,sum3;
@@ -506,7 +491,7 @@ int16_t CaculateHR_ECG()
 	
 	for(i=0,j=0;i<CAL_HR_SIZE-3;i++)
 	{
-		 sum1=BiaArray[i];
+		sum1=BiaArray[i];
         sum2=BiaArray[i+1];
         sum3=BiaArray[i+2];
         if(sum1<sum2 && sum2>sum3 && BiaArray[i+1]*10>thr2)
@@ -515,14 +500,12 @@ int16_t CaculateHR_ECG()
         }
 	}
 
-	 if(j>2)
-    
-    {
-		     for(i=0;i<j-1;i++)
-		    {
-			    aun_red_buffer[i] = aun_red_buffer[i+1] - aun_red_buffer[i];
-		    }
-         CalHr= 6000/GetAverage(aun_red_buffer,j-1);
+	 if(j>2) {
+		for(i=0;i<j-1;i++) {
+			aun_red_buffer[i] = aun_red_buffer[i+1] - aun_red_buffer[i];
+		}
+
+        CalHr= 6000/GetAverage(aun_red_buffer,j-1);
     }
 
 	 return CalHr;

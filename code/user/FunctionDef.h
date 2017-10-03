@@ -6,10 +6,20 @@
 //#define FOR_ANDROID 1
 
 #define FUNCTION_NONE  0
-#define FUNCTION_ECG  1
-#define FUNCTION_PPG 2
-#define FUNCTION_GSR 3
-#define FUNCTION_SPO2 4
+#define FUNCTION_ECG   1
+#define FUNCTION_PPG   2
+#define FUNCTION_GSR   3
+#define FUNCTION_SPO2  4
+
+#if 0
+enum board_mode {
+  FUNCTION_NONE = 0,
+  FUNCTION_ECG,
+  FUNCTION_PPG,
+  FUNCTION_GSR,
+  FUNCTION_SPO2
+};
+#endif
 
 extern __IO uint8_t Function_Select;
 void DrawWaves(int data);

@@ -183,12 +183,11 @@ void USART_RCC_Configuration(void)
  * 函数名：USART1_Config
  * 描述  ：USART1 GPIO 配置,工作模式配置。115200 8-N-1
  * 输入  ：无
- * 输出  : 无
+ * 输出  :    无
  * 调用  ：外部调用
  */
 void USART_Config(u32 BandRate)
-{
-	
+{	
 	USART_InitTypeDef USART_InitStructure;
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1  | RCC_APB2Periph_GPIOA, ENABLE);
@@ -198,34 +197,30 @@ void USART_Config(u32 BandRate)
 	USART_GPIO_Configuration();
 
 	USART_InitStructure.USART_BaudRate = BandRate;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_1;
-  USART_InitStructure.USART_Parity = USART_Parity_No;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+    USART_InitStructure.USART_StopBits = USART_StopBits_1;
+    USART_InitStructure.USART_Parity = USART_Parity_No;
+    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 	
 	USART_Init(USARTy, &USART_InitStructure);
 	USART_Init(USARTz, &USART_InitStructure);
-	
-
  
-  /* Enable the USARTz Receive Interrupt */
-  USART_ITConfig(USARTy, USART_IT_RXNE, ENABLE);
-  
-  /* Enable USARTy */
-  USART_Cmd(USARTy, ENABLE);
+    /* Enable the USARTz Receive Interrupt */
+    USART_ITConfig(USARTy, USART_IT_RXNE, ENABLE);
 
-   /* Enable USARTz */
-  USART_Cmd(USARTz, ENABLE);
+    /* Enable USARTy */
+    USART_Cmd(USARTy, ENABLE);
 
-  
-
- 
+    /* Enable USARTz */
+    USART_Cmd(USARTz, ENABLE); 
 }
+
 void USART_SendString(char * DataBuf)
 {
 	USART1_SendDataDMA((uint8_t *)DataBuf,strlen(DataBuf));
 }
+
 void USART1_SendDataDMA(uint8_t * DataBuf,uint8_t len)
 {
 	

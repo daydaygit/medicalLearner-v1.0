@@ -111,8 +111,8 @@ typedef struct
 
 #define DMA_DIR_PeripheralDST              ((uint32_t)0x00000010)
 #define DMA_DIR_PeripheralSRC              ((uint32_t)0x00000000)
-#define IS_DMA_DIR(DIR) (((DIR) == DMA_DIR_PeripheralDST) || \
-                         ((DIR) == DMA_DIR_PeripheralSRC))
+#define IS_DMA_DIR(DIR)                    (((DIR) == DMA_DIR_PeripheralDST) || \
+                                            ((DIR) == DMA_DIR_PeripheralSRC))
 /**
   * @}
   */

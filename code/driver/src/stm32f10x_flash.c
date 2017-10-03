@@ -251,22 +251,24 @@
   *     @arg FLASH_Latency_2: FLASH Two Latency cycles
   * @retval None
   */
+
+/* FLASH时序延迟几个周期，等待总线同步操作。
+  * 推荐按照单片机系统运行频率，0 ~ 24MHz时，取Latency=0；
+  *                                                                          24 ~ 48MHz时，取Latency=1；
+  *                                                                          48 ~ 72MHz时，取Latency=2
+  */
 void FLASH_SetLatency(uint32_t FLASH_Latency)
 {
   uint32_t tmpreg = 0;
-  
-  /* Check the parameters */
-  assert_param(IS_FLASH_LATENCY(FLASH_Latency));
-  
-  /* Read the ACR register */
-  tmpreg = FLASH->ACR;  
-  
-  /* Sets the Latency value */
+
+  assert_param(IS_FLASH_LATENCY(FLASH_Latency));  /* Check the parameters */
+
+  tmpreg = FLASH->ACR;                            /* Read the ACR register */
+
   tmpreg &= ACR_LATENCY_Mask;
-  tmpreg |= FLASH_Latency;
-  
-  /* Write the ACR register */
-  FLASH->ACR = tmpreg;
+  tmpreg |= FLASH_Latency;                        /* Sets the Latency value */
+
+  FLASH->ACR = tmpreg;                            /* Write the ACR register */
 }
 
 /**
@@ -293,14 +295,13 @@ void FLASH_HalfCycleAccessCmd(uint32_t FLASH_HalfCycleAccess)
   * @note   This function can be used for all STM32F10x devices.
   * @param  FLASH_PrefetchBuffer: specifies the Prefetch buffer status.
   *   This parameter can be one of the following values:
-  *     @arg FLASH_PrefetchBuffer_Enable: FLASH Prefetch Buffer Enable
+  *     @arg FLASH_PrefetchBuffer_Enable:  FLASH Prefetch Buffer Enable
   *     @arg FLASH_PrefetchBuffer_Disable: FLASH Prefetch Buffer Disable
   * @retval None
   */
 void FLASH_PrefetchBufferCmd(uint32_t FLASH_PrefetchBuffer)
 {
-  /* Check the parameters */
-  assert_param(IS_FLASH_PREFETCHBUFFER_STATE(FLASH_PrefetchBuffer));
+  assert_param(IS_FLASH_PREFETCHBUFFER_STATE(FLASH_PrefetchBuffer));     /* Check the parameters */
   
   /* Enable or disable the Prefetch Buffer */
   FLASH->ACR &= ACR_PRFTBE_Mask;

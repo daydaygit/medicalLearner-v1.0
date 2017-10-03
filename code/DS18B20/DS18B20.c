@@ -40,12 +40,13 @@ char ConfiureIoFor18b20(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
 	
 	DS18B20 = GPIO_Pin;
 	/* 配置DS18b20 通信 io */	
-	GPIO_InitStructure.GPIO_Pin = DS18B20; //将DS18B20设为16脚
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;  //开漏输出	 
+	GPIO_InitStructure.GPIO_Pin   = DS18B20;             //将DS18B20设为16脚
+	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_OD;    //开漏输出	 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	 //输出的最大频率为50HZ
-	GPIO_Init(GPIOA, &GPIO_InitStructure);   //初始化GPIOA端口
-	GPIO_Write(GPIOA,0xffff);  //将GPIOA 16个端口全部置为高电平
+	GPIO_Init(GPIOA, &GPIO_InitStructure);               //初始化GPIOA端口
+	GPIO_Write(GPIOA,0xffff);                            //将GPIOA 16个端口全部置为高电平
 }
+
 /************************************************************
 *函数:18B20初始化
 *参数:

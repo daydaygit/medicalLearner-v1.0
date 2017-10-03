@@ -17,7 +17,7 @@ extern __IO uint16_t ADC_ConvertedValue[M];
 
 void ADC1_Init(void);
 
-#define StartCollect  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 , ENABLE);TIM_Cmd(TIM3, ENABLE)
-#define StopCollect  TIM_Cmd(TIM3, DISABLE);RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 , DISABLE)
+#define StartCollect  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);TIM_Cmd(TIM3, ENABLE)
+#define StopCollect   TIM_Cmd(TIM3, DISABLE);RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 , DISABLE)
 
 #endif

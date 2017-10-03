@@ -103,10 +103,8 @@ void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup)
 }
 
 /**
-  * @brief  Initializes the NVIC peripheral according to the specified
-  *         parameters in the NVIC_InitStruct.
-  * @param  NVIC_InitStruct: pointer to a NVIC_InitTypeDef structure that contains
-  *         the configuration information for the specified NVIC peripheral.
+  * @brief  Initializes the NVIC peripheral according to the specified parameters in the NVIC_InitStruct.
+  * @param  NVIC_InitStruct: pointer to a NVIC_InitTypeDef structure that contains the configuration information for the specified NVIC peripheral.
   * @retval None
   */
 void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct)

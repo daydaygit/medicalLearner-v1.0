@@ -52,106 +52,75 @@ void Max30102_EXTI_Config(void)
 Error_Success InitMax30100()
 {
 	uint8_t RegValue;
+
 	Max30102_EXTI_Config();
-	#ifdef USE_SOFT_I2C
+
+#ifdef USE_SOFT_I2C
 	BSP_InitI2C();
-	
-	/*复位30100*/
-	ResetMax30100();
+
+	ResetMax30100();	/*复位30100*/
+
+  if(!Max30102_SoftI2C_Write(REG_INT_ENALE1_ADDR,0xc0))      {   return I2C_Com_Error;   } // INTR setting
+
+  if(!Max30102_SoftI2C_Write(REG_INT_ENALE2_ADDR,0x00))      {   return I2C_Com_Error;   }
+
+  if(!Max30102_SoftI2C_Write(REG_FIFO_WR_PTR_ADDR,0x00))     {   return I2C_Com_Error;   }  //FIFO_WR_PTR[4:0]
+
+  if(!Max30102_SoftI2C_Write(REG_FIFO_OV_COUNTER_ADDR,0x00)) {   return I2C_Com_Error;   }  //OVF_COUNTER[4:0]
+
+  if(!Max30102_SoftI2C_Write(REG_FIFO_RD_PTR_ADDR,0x00))     {   return I2C_Com_Error;   }  //FIFO_RD_PTR[4:0]
+
+  if(!Max30102_SoftI2C_Write(REG_FIFO_CONFIG_ADDR,0x0f))     {   return I2C_Com_Error;   }  //sample avg = 1, fifo rollover=false, fifo almost full = 17
+
+  if(!Max30102_SoftI2C_Write(REG_MODE_CONFIG_ADDR,0x03))     {   return I2C_Com_Error;   }   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
+
+  if(!Max30102_SoftI2C_Write(REG_SPO2_CONFIG_ADDR,0x27))     {   return I2C_Com_Error;   }  // SPO2_ADC range = 4096nA, SPO2 sample rate (100 Hz), LED pulseWidth (400uS)
+
   
-	
-	if(!Max30102_SoftI2C_Write(REG_INT_ENALE1_ADDR,0xc0)) // INTR setting
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_INT_ENALE2_ADDR,0x00))
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_FIFO_WR_PTR_ADDR,0x00))  //FIFO_WR_PTR[4:0]
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_FIFO_OV_COUNTER_ADDR,0x00))  //OVF_COUNTER[4:0]
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_FIFO_RD_PTR_ADDR,0x00))  //FIFO_RD_PTR[4:0]
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_FIFO_CONFIG_ADDR,0x0f))  //sample avg = 1, fifo rollover=false, fifo almost full = 17
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_MODE_CONFIG_ADDR,0x03))   //0x02 for Red only, 0x03 for SpO2 mode 0x07 multimode LED
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_SPO2_CONFIG_ADDR,0x27))  // SPO2_ADC range = 4096nA, SPO2 sample rate (100 Hz), LED pulseWidth (400uS)
-    return I2C_Com_Error;
-  
-  if(!Max30102_SoftI2C_Write(REG_LED1_PA_ADDR,0x24))   //Choose value for ~ 7mA for LED1
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_LED2_PA_ADDR,0x24))   // Choose value for ~ 7mA for LED2
-    return I2C_Com_Error;
-  if(!Max30102_SoftI2C_Write(REG_PILOT_PA_ADDR,0x7f))   // Choose value for ~ 25mA for Pilot LED
-    return I2C_Com_Error;
-	
-	#else
-	
-	/*初始化30100的I2C通讯*/
-	InitMax30100I2C();
-	
-	/*复位30100*/
-	ResetMax30100();
-  
+  if(!Max30102_SoftI2C_Write(REG_LED1_PA_ADDR,0x24))         {   return I2C_Com_Error;   }   //Choose value for ~ 7mA for LED1
+
+  if(!Max30102_SoftI2C_Write(REG_LED2_PA_ADDR,0x24))         {   return I2C_Com_Error;   }   // Choose value for ~ 7mA for LED2
+
+  if(!Max30102_SoftI2C_Write(REG_PILOT_PA_ADDR,0x7f))        {   return I2C_Com_Error;   }   // Choose value for ~ 25mA for Pilot LED
+
+#else
+
+	InitMax30100I2C();	/*初始化30100的I2C通讯*/
+
+	ResetMax30100();	/*复位30100*/  
 	
 	/*中断设置*/
-	if(Max30100_WriteReg(REG_INT_ENALE1_ADDR,INT_A_FULL_EN) <= 0)//INT_PROX_INT_EN INT_PPG_RDY_EN 开放中断，FIFO满，new data，光照条件
-	{
-		return I2C_Com_Error;
-	}
-	if(Max30100_WriteReg(REG_INT_ENALE2_ADDR,0x00) <= 0)//
-	{
-		return I2C_Com_Error;
-	}
+	if(Max30100_WriteReg(REG_INT_ENALE1_ADDR,INT_A_FULL_EN) <= 0) {   return I2C_Com_Error;   }//INT_PROX_INT_EN INT_PPG_RDY_EN 开放中断，FIFO满，new data，光照条件
+
+	if(Max30100_WriteReg(REG_INT_ENALE2_ADDR,0x00) <= 0)	      {   return I2C_Com_Error;   }
+
 	
-	//FIFO 配置	
-	/*写指针清0*/
-	if(Max30100_WriteReg(REG_FIFO_WR_PTR_ADDR,0) <= 0)
-	{
-		return I2C_Com_Error;
-	}
-	/*溢出值清0*/
-	if(Max30100_WriteReg(REG_FIFO_OV_COUNTER_ADDR,0) <= 0)
-	{
-		return I2C_Com_Error;
-	}
-	/*读指针清0*/
-	if(Max30100_WriteReg(REG_FIFO_RD_PTR_ADDR,0) <= 0)
-	{
-		return I2C_Com_Error;
-	}
-	if(Max30100_WriteReg(REG_FIFO_CONFIG_ADDR,AMP_AVE_BY_8|0xf) <= 0) //相邻4点平均, fifo 覆盖存储禁止, FIFO 满标志 = 17
-	{
-		return I2C_Com_Error;
-	}
+	//FIFO 配置
+	if(Max30100_WriteReg(REG_FIFO_WR_PTR_ADDR,0) <= 0) 	          {   return I2C_Com_Error;	}	/*写指针清0*/
+
+	if(Max30100_WriteReg(REG_FIFO_OV_COUNTER_ADDR,0) <= 0)	      {   return I2C_Com_Error;	}	/*溢出值清0*/
+
+	if(Max30100_WriteReg(REG_FIFO_RD_PTR_ADDR,0) <= 0)	          {   return I2C_Com_Error;	}	/*读指针清0*/
+	
+	if(Max30100_WriteReg(REG_FIFO_CONFIG_ADDR,AMP_AVE_BY_8|0xf) <= 0) {   return I2C_Com_Error;   } //相邻4点平均, fifo 覆盖存储禁止, FIFO 满标志 = 17
+
+
 	/*工作模式配置*/
 	SetMax30100WorkMode(SpO2_Only);//0x02 HR 只红灯, 0x03 for SpO2 模式 0x07 复合 LED
-	//SpO2 模式
-	if(Max30100_WriteReg(REG_SPO2_CONFIG_ADDR,SPO2_ADC_RGE_2|SPO2_SR_100|LED_PW_AD_18) <= 0)
-	{
-		return I2C_Com_Error;
-	}
-	//
-	if(Max30100_WriteReg(REG_LED1_PA_ADDR,0x41) <= 0) //设置LED1 ~ 7mA 
-	{
-		return I2C_Com_Error;
-	}
-	if(Max30100_WriteReg(REG_LED2_PA_ADDR,0x41) <= 0) //设置LED2 ~ 7mA 
-	{
-		return I2C_Com_Error;
-	}
-	if(Max30100_WriteReg(REG_PILOT_PA_ADDR,0x8f) <= 0) //25mA for Pilot LED
-	{
-		return I2C_Com_Error;
-	}
-	if(Max30100_WriteReg(REG_PROXIMITY_INT_THRESH_ADDR,30) <= 0) //25mA for Pilot LED
-	{
-		return I2C_Com_Error;
-	}
-  /*if(Max30100_WriteReg(REG_MULTI_LED_CONFIG1_ADDR,(LED1_RED_PA<<SLOT13_POS)|(LED2_IR_PA<<SLOT24_POS)) <= 0) //25mA for Pilot LED
-	{
-		return I2C_Com_Error;
-	}*/
-	#endif
+
+	if(Max30100_WriteReg(REG_SPO2_CONFIG_ADDR,SPO2_ADC_RGE_2|SPO2_SR_100|LED_PW_AD_18) <= 0)   {   return I2C_Com_Error;   }	//SpO2 模式
+
+	if(Max30100_WriteReg(REG_LED1_PA_ADDR,0x41) <= 0)             {   return I2C_Com_Error;   } //设置LED1 ~ 7mA 
+
+	if(Max30100_WriteReg(REG_LED2_PA_ADDR,0x41) <= 0)             {   return I2C_Com_Error;   } //设置LED2 ~ 7mA 
+
+	if(Max30100_WriteReg(REG_PILOT_PA_ADDR,0x8f) <= 0)            {   return I2C_Com_Error;   } //25mA for Pilot LED
+
+	if(Max30100_WriteReg(REG_PROXIMITY_INT_THRESH_ADDR,30) <= 0)  {   return I2C_Com_Error;   } //25mA for Pilot LED
+
+    /*if(Max30100_WriteReg(REG_MULTI_LED_CONFIG1_ADDR,(LED1_RED_PA<<SLOT13_POS)|(LED2_IR_PA<<SLOT24_POS)) <= 0)  	{	return I2C_Com_Error;	} //25mA for Pilot LED */
+#endif
+
 	return Success;
 }
 uint8_t ResetMax30100()
@@ -184,7 +153,8 @@ uint8_t ReadMax30100Tmp(uint8_t * tmp)
 uint8_t ReadMax30100Status(uint16_t * status)
 {
 	uint8_t temp;
-	#ifdef USE_SOFT_I2C
+
+#ifdef USE_SOFT_I2C
 	*status =  Max30102_SoftI2C_Read (REG_INT_STATUS0_ADDR);
 	temp =  Max30102_SoftI2C_Read (REG_INT_STATUS1_ADDR);
 	*status += (temp<<8);
@@ -199,7 +169,8 @@ uint8_t ReadMax30100Status(uint16_t * status)
 		return I2C_Com_Error;
 	}
 	*status += (temp<<8);
-	#endif
+#endif
+
 	return Success;
 }
 uint8_t ReadMax30100FifoLength(uint8_t * sampleLen)

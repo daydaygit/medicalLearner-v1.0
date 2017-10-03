@@ -94,9 +94,9 @@ typedef enum
   * @{
   */
 
-#define FLASH_PrefetchBuffer_Enable    ((uint32_t)0x00000010)  /*!< FLASH Prefetch Buffer Enable */
-#define FLASH_PrefetchBuffer_Disable   ((uint32_t)0x00000000)  /*!< FLASH Prefetch Buffer Disable */
-#define IS_FLASH_PREFETCHBUFFER_STATE(STATE) (((STATE) == FLASH_PrefetchBuffer_Enable) || \
+#define FLASH_PrefetchBuffer_Enable           ((uint32_t)0x00000010)  /*!< FLASH Prefetch Buffer Enable */
+#define FLASH_PrefetchBuffer_Disable          ((uint32_t)0x00000000)  /*!< FLASH Prefetch Buffer Disable */
+#define IS_FLASH_PREFETCHBUFFER_STATE(STATE)  (((STATE) == FLASH_PrefetchBuffer_Enable) || \
                                               ((STATE) == FLASH_PrefetchBuffer_Disable)) 
 /**
   * @}

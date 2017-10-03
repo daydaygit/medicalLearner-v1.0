@@ -430,8 +430,8 @@ typedef struct
 #define RCC_PCLK2_Div4                   ((uint32_t)0x00004000)
 #define RCC_PCLK2_Div6                   ((uint32_t)0x00008000)
 #define RCC_PCLK2_Div8                   ((uint32_t)0x0000C000)
-#define IS_RCC_ADCCLK(ADCCLK) (((ADCCLK) == RCC_PCLK2_Div2) || ((ADCCLK) == RCC_PCLK2_Div4) || \
-                               ((ADCCLK) == RCC_PCLK2_Div6) || ((ADCCLK) == RCC_PCLK2_Div8))
+#define IS_RCC_ADCCLK(ADCCLK)            (((ADCCLK) == RCC_PCLK2_Div2) || ((ADCCLK) == RCC_PCLK2_Div4) || \
+                                          ((ADCCLK) == RCC_PCLK2_Div6) || ((ADCCLK) == RCC_PCLK2_Div8))
 /**
   * @}
   */

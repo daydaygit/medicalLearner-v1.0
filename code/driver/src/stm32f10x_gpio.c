@@ -174,21 +174,22 @@ void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
 {
   uint32_t currentmode = 0x00, currentpin = 0x00, pinpos = 0x00, pos = 0x00;
   uint32_t tmpreg = 0x00, pinmask = 0x00;
+
   /* Check the parameters */
   assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
   assert_param(IS_GPIO_MODE(GPIO_InitStruct->GPIO_Mode));
   assert_param(IS_GPIO_PIN(GPIO_InitStruct->GPIO_Pin));  
   
-/*---------------------------- GPIO Mode Configuration -----------------------*/
+  /*  GPIO Mode Configuration  */
   currentmode = ((uint32_t)GPIO_InitStruct->GPIO_Mode) & ((uint32_t)0x0F);
   if ((((uint32_t)GPIO_InitStruct->GPIO_Mode) & ((uint32_t)0x10)) != 0x00)
   { 
-    /* Check the parameters */
-    assert_param(IS_GPIO_SPEED(GPIO_InitStruct->GPIO_Speed));
-    /* Output mode */
-    currentmode |= (uint32_t)GPIO_InitStruct->GPIO_Speed;
+    assert_param(IS_GPIO_SPEED(GPIO_InitStruct->GPIO_Speed));    /* Check the parameters */
+
+    currentmode |= (uint32_t)GPIO_InitStruct->GPIO_Speed;        /* Output mode */
   }
-/*---------------------------- GPIO CRL Configuration ------------------------*/
+
+  /* GPIO CRL Configuration */
   /* Configure the eight low port pins */
   if (((uint32_t)GPIO_InitStruct->GPIO_Pin & ((uint32_t)0x00FF)) != 0x00)
   {
@@ -357,8 +358,7 @@ uint16_t GPIO_ReadOutputData(GPIO_TypeDef* GPIOx)
   */
 void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
-  /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));  /* Check the parameters */
   assert_param(IS_GPIO_PIN(GPIO_Pin));
   
   GPIOx->BSRR = GPIO_Pin;

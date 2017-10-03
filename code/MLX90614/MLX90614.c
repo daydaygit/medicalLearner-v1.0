@@ -213,18 +213,16 @@ void MLX90614_Init()
 // the same INIT in IIC so ...
     GPIO_InitTypeDef    GPIO_InitStructure;
 
-	/* Enable SMBUS_PORT clocks */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SMBUS_PORT, ENABLE);
 
-    /*??SMBUS_SCK?SMBUS_SDA????????*/
-    GPIO_InitStructure.GPIO_Pin = SMBUS_SCK | SMBUS_SDA;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SMBUS_PORT, ENABLE);	/* Enable SMBUS_PORT clocks */
+
+    GPIO_InitStructure.GPIO_Pin = SMBUS_SCK | SMBUS_SDA;    /*??SMBUS_SCK?SMBUS_SDA????????*/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(SMBUS_PORT, &GPIO_InitStructure);
 
     SMBUS_SCK_H();
     SMBUS_SDA_H();
-		 	
 }
 
 /*******************************************************************************

@@ -216,10 +216,9 @@ void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitTypeDef* DMA_InitStruc
   assert_param(IS_DMA_M2M_STATE(DMA_InitStruct->DMA_M2M));
 
 /*--------------------------- DMAy Channelx CCR Configuration -----------------*/
-  /* Get the DMAy_Channelx CCR value */
-  tmpreg = DMAy_Channelx->CCR;
-  /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRC and DIR bits */
-  tmpreg &= CCR_CLEAR_Mask;
+  tmpreg = DMAy_Channelx->CCR;                  /* Get the DMAy_Channelx CCR value */
+
+  tmpreg &= CCR_CLEAR_Mask;                     /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRC and DIR bits */
   /* Configure DMAy Channelx: data transfer, data size, priority level and mode */
   /* Set DIR bit according to DMA_DIR value */
   /* Set CIRC bit according to DMA_Mode value */
@@ -229,25 +228,22 @@ void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitTypeDef* DMA_InitStruc
   /* Set MSIZE bits according to DMA_MemoryDataSize value */
   /* Set PL bits according to DMA_Priority value */
   /* Set the MEM2MEM bit according to DMA_M2M value */
-  tmpreg |= DMA_InitStruct->DMA_DIR | DMA_InitStruct->DMA_Mode |
-            DMA_InitStruct->DMA_PeripheralInc | DMA_InitStruct->DMA_MemoryInc |
-            DMA_InitStruct->DMA_PeripheralDataSize | DMA_InitStruct->DMA_MemoryDataSize |
-            DMA_InitStruct->DMA_Priority | DMA_InitStruct->DMA_M2M;
+  tmpreg |= DMA_InitStruct->DMA_DIR  | \
+            DMA_InitStruct->DMA_Mode | \
+            DMA_InitStruct->DMA_PeripheralInc | \
+            DMA_InitStruct->DMA_MemoryInc | \
+            DMA_InitStruct->DMA_PeripheralDataSize | \
+            DMA_InitStruct->DMA_MemoryDataSize | \
+            DMA_InitStruct->DMA_Priority | \
+            DMA_InitStruct->DMA_M2M;
 
-  /* Write to DMAy Channelx CCR */
-  DMAy_Channelx->CCR = tmpreg;
+  DMAy_Channelx->CCR = tmpreg;                                   /* Write to DMAy Channelx CCR */
 
-/*--------------------------- DMAy Channelx CNDTR Configuration ---------------*/
-  /* Write to DMAy Channelx CNDTR */
-  DMAy_Channelx->CNDTR = DMA_InitStruct->DMA_BufferSize;
+  DMAy_Channelx->CNDTR = DMA_InitStruct->DMA_BufferSize;         /* Write to DMAy Channelx CNDTR */
 
-/*--------------------------- DMAy Channelx CPAR Configuration ----------------*/
-  /* Write to DMAy Channelx CPAR */
-  DMAy_Channelx->CPAR = DMA_InitStruct->DMA_PeripheralBaseAddr;
+  DMAy_Channelx->CPAR = DMA_InitStruct->DMA_PeripheralBaseAddr;  /* Write to DMAy Channelx CPAR */
 
-/*--------------------------- DMAy Channelx CMAR Configuration ----------------*/
-  /* Write to DMAy Channelx CMAR */
-  DMAy_Channelx->CMAR = DMA_InitStruct->DMA_MemoryBaseAddr;
+  DMAy_Channelx->CMAR = DMA_InitStruct->DMA_MemoryBaseAddr;      /* Write to DMAy Channelx CMAR */
 }
 
 /**
@@ -293,20 +289,11 @@ void DMA_StructInit(DMA_InitTypeDef* DMA_InitStruct)
   */
 void DMA_Cmd(DMA_Channel_TypeDef* DMAy_Channelx, FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));
+  assert_param(IS_DMA_ALL_PERIPH(DMAy_Channelx));  /* Check the parameters */
   assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-  if (NewState != DISABLE)
-  {
-    /* Enable the selected DMAy Channelx */
-    DMAy_Channelx->CCR |= DMA_CCR1_EN;
-  }
-  else
-  {
-    /* Disable the selected DMAy Channelx */
-    DMAy_Channelx->CCR &= (uint16_t)(~DMA_CCR1_EN);
-  }
+  if (NewState != DISABLE) {  DMAy_Channelx->CCR |= DMA_CCR1_EN;              }  /* Enable the selected DMAy Channelx */
+  else                     {  DMAy_Channelx->CCR &= (uint16_t)(~DMA_CCR1_EN); }  /* Disable the selected DMAy Channelx */
 }
 
 /**

@@ -301,16 +301,9 @@ void ADC_Cmd(ADC_TypeDef* ADCx, FunctionalState NewState)
   /* Check the parameters */
   assert_param(IS_ADC_ALL_PERIPH(ADCx));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
-  if (NewState != DISABLE)
-  {
-    /* Set the ADON bit to wake up the ADC from power down mode */
-    ADCx->CR2 |= CR2_ADON_Set;
-  }
-  else
-  {
-    /* Disable the selected ADC peripheral */
-    ADCx->CR2 &= CR2_ADON_Reset;
-  }
+
+  if (NewState != DISABLE) {   ADCx->CR2 |= CR2_ADON_Set;    }    /* Set the ADON bit to wake up the ADC from power down mode */
+  else                     {   ADCx->CR2 &= CR2_ADON_Reset;  }    /* Disable the selected ADC peripheral */
 }
 
 /**
@@ -326,16 +319,9 @@ void ADC_DMACmd(ADC_TypeDef* ADCx, FunctionalState NewState)
   /* Check the parameters */
   assert_param(IS_ADC_DMA_PERIPH(ADCx));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
-  if (NewState != DISABLE)
-  {
-    /* Enable the selected ADC DMA request */
-    ADCx->CR2 |= CR2_DMA_Set;
-  }
-  else
-  {
-    /* Disable the selected ADC DMA request */
-    ADCx->CR2 &= CR2_DMA_Reset;
-  }
+
+  if (NewState != DISABLE) {    ADCx->CR2 |= CR2_DMA_Set;    }    /* Enable the selected ADC DMA request */
+  else                     {    ADCx->CR2 &= CR2_DMA_Reset;  }    /* Disable the selected ADC DMA request */
 }
 
 /**
@@ -378,10 +364,9 @@ void ADC_ITConfig(ADC_TypeDef* ADCx, uint16_t ADC_IT, FunctionalState NewState)
   */
 void ADC_ResetCalibration(ADC_TypeDef* ADCx)
 {
-  /* Check the parameters */
-  assert_param(IS_ADC_ALL_PERIPH(ADCx));
-  /* Resets the selected ADC calibration registers */  
-  ADCx->CR2 |= CR2_RSTCAL_Set;
+  assert_param(IS_ADC_ALL_PERIPH(ADCx));  	/* Check the parameters */
+
+  ADCx->CR2 |= CR2_RSTCAL_Set;  			/* Resets the selected ADC calibration registers */  
 }
 
 /**
@@ -392,21 +377,14 @@ void ADC_ResetCalibration(ADC_TypeDef* ADCx)
 FlagStatus ADC_GetResetCalibrationStatus(ADC_TypeDef* ADCx)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ADC_ALL_PERIPH(ADCx));
+
+  assert_param(IS_ADC_ALL_PERIPH(ADCx));  /* Check the parameters */
+
   /* Check the status of RSTCAL bit */
-  if ((ADCx->CR2 & CR2_RSTCAL_Set) != (uint32_t)RESET)
-  {
-    /* RSTCAL bit is set */
-    bitstatus = SET;
-  }
-  else
-  {
-    /* RSTCAL bit is reset */
-    bitstatus = RESET;
-  }
-  /* Return the RSTCAL bit status */
-  return  bitstatus;
+  if ((ADCx->CR2 & CR2_RSTCAL_Set) != (uint32_t)RESET)  {   bitstatus = SET;    }    /* RSTCAL bit is set */
+  else                                                  {   bitstatus = RESET;  }    /* RSTCAL bit is reset */
+
+  return  bitstatus;  /* Return the RSTCAL bit status */
 }
 
 /**
@@ -416,10 +394,9 @@ FlagStatus ADC_GetResetCalibrationStatus(ADC_TypeDef* ADCx)
   */
 void ADC_StartCalibration(ADC_TypeDef* ADCx)
 {
-  /* Check the parameters */
-  assert_param(IS_ADC_ALL_PERIPH(ADCx));
-  /* Enable the selected ADC calibration process */  
-  ADCx->CR2 |= CR2_CAL_Set;
+  assert_param(IS_ADC_ALL_PERIPH(ADCx));    /* Check the parameters */
+
+  ADCx->CR2 |= CR2_CAL_Set;  				/* Enable the selected ADC calibration process */
 }
 
 /**
@@ -430,21 +407,13 @@ void ADC_StartCalibration(ADC_TypeDef* ADCx)
 FlagStatus ADC_GetCalibrationStatus(ADC_TypeDef* ADCx)
 {
   FlagStatus bitstatus = RESET;
-  /* Check the parameters */
-  assert_param(IS_ADC_ALL_PERIPH(ADCx));
+
+  assert_param(IS_ADC_ALL_PERIPH(ADCx));  /* Check the parameters */
   /* Check the status of CAL bit */
-  if ((ADCx->CR2 & CR2_CAL_Set) != (uint32_t)RESET)
-  {
-    /* CAL bit is set: calibration on going */
-    bitstatus = SET;
-  }
-  else
-  {
-    /* CAL bit is reset: end of calibration */
-    bitstatus = RESET;
-  }
-  /* Return the CAL bit status */
-  return  bitstatus;
+  if ((ADCx->CR2 & CR2_CAL_Set) != (uint32_t)RESET) {    bitstatus = SET;    }    /* CAL bit is set: calibration on going */
+  else                                              {    bitstatus = RESET;  }    /* CAL bit is reset: end of calibration */
+
+  return  bitstatus;  /* Return the CAL bit status */
 }
 
 /**
@@ -456,21 +425,11 @@ FlagStatus ADC_GetCalibrationStatus(ADC_TypeDef* ADCx)
   */
 void ADC_SoftwareStartConvCmd(ADC_TypeDef* ADCx, FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_ADC_ALL_PERIPH(ADCx));
+  assert_param(IS_ADC_ALL_PERIPH(ADCx));            /* Check the parameters */
   assert_param(IS_FUNCTIONAL_STATE(NewState));
-  if (NewState != DISABLE)
-  {
-    /* Enable the selected ADC conversion on external event and start the selected
-       ADC conversion */
-    ADCx->CR2 |= CR2_EXTTRIG_SWSTART_Set;
-  }
-  else
-  {
-    /* Disable the selected ADC conversion on external event and stop the selected
-       ADC conversion */
-    ADCx->CR2 &= CR2_EXTTRIG_SWSTART_Reset;
-  }
+
+  if (NewState != DISABLE)  { ADCx->CR2 |= CR2_EXTTRIG_SWSTART_Set;    } /* Enable the selected ADC conversion on external event and start the selected ADC conversion */
+  else                      { ADCx->CR2 &= CR2_EXTTRIG_SWSTART_Reset;  } /* Disable the selected ADC conversion on external event and stop the selected ADC conversion */
 }
 
 /**

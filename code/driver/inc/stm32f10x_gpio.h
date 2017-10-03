@@ -60,24 +60,24 @@ typedef enum
   GPIO_Speed_10MHz = 1,
   GPIO_Speed_2MHz, 
   GPIO_Speed_50MHz
-}GPIOSpeed_TypeDef;
+} GPIOSpeed_TypeDef;
+
 #define IS_GPIO_SPEED(SPEED) (((SPEED) == GPIO_Speed_10MHz) || ((SPEED) == GPIO_Speed_2MHz) || \
                               ((SPEED) == GPIO_Speed_50MHz))
 
 /** 
   * @brief  Configuration Mode enumeration  
   */
-
 typedef enum
-{ GPIO_Mode_AIN = 0x0,
+{ GPIO_Mode_AIN         = 0x0,
   GPIO_Mode_IN_FLOATING = 0x04,
-  GPIO_Mode_IPD = 0x28,
-  GPIO_Mode_IPU = 0x48,
-  GPIO_Mode_Out_OD = 0x14,
-  GPIO_Mode_Out_PP = 0x10,
-  GPIO_Mode_AF_OD = 0x1C,
-  GPIO_Mode_AF_PP = 0x18
-}GPIOMode_TypeDef;
+  GPIO_Mode_IPD         = 0x28,
+  GPIO_Mode_IPU         = 0x48,
+  GPIO_Mode_Out_OD      = 0x14,
+  GPIO_Mode_Out_PP      = 0x10,
+  GPIO_Mode_AF_OD       = 0x1C,
+  GPIO_Mode_AF_PP       = 0x18
+} GPIOMode_TypeDef;
 
 #define IS_GPIO_MODE(MODE) (((MODE) == GPIO_Mode_AIN) || ((MODE) == GPIO_Mode_IN_FLOATING) || \
                             ((MODE) == GPIO_Mode_IPD) || ((MODE) == GPIO_Mode_IPU) || \
