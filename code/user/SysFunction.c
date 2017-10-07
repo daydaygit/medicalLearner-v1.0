@@ -6,8 +6,10 @@
 #define CAL_SAMPLE_SIZE     500
 #define CAL_HR_SIZE         400
 
-const u8 BMP_Buf[] = {0xF8,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xF8,0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF,
-0xFF,0x7F,0x3F,0x1F,0x0F,0x07,0x03,0x01};
+const u8 BMP_Buf[] = {0xF8,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,
+                      0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xF8,
+                      0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF,
+                      0xFF,0x7F,0x3F,0x1F,0x0F,0x07,0x03,0x01};
 
 static uint8_t 	Xvalue=0;
 static uint8_t 	Yvalue=0;
@@ -167,12 +169,12 @@ void ShowTemperature(void)
 	static uint8_t mlx96014_count = 0;
 
 	//DS18b20 温度测试 
-	ds18b20_count ++;
+	ds18b20_count++;
 	if( ds18b20_count >= 200) {
 		ds18b20_count = 0;
 		tmpperatureDS = ReadTemperature();
 		if( tmpperatureDS < 0) {
-			tmpperatureDS *= -1;
+			tmpperatureDS *= -1;    // 负数转成正数
 			sprintf(TempDisplayBuf,"Td:-%d.%02d",tmpperatureDS/16,(10000/(tmpperatureDS&0xf))/100);
 		} else {
 			sprintf(TempDisplayBuf,"Td:%d.%02d",tmpperatureDS/16,(10000/(tmpperatureDS&0xf))/100);
@@ -294,18 +296,18 @@ void Caculate_HR_SpO2(uint8_t * DataBuf,uint8_t dataLen)
 
 void ShowHeart(u8 show)
 {
-	if( show == 1 ) {  OLED_DrawBMP(0,6,16,8,BMP_Buf);  }
-	else            {  OLED_ClearBMP(0,6,16,8);         } 
+	if( show == 1 ) {   OLED_DrawBMP(0,6,16,8, BMP_Buf);  }  // u8 x0, u8 y0,u8 x1, u8 y1,const u8 BMP[]
+	else            {  OLED_ClearBMP(0,6,16,8);           } 
 }
 
 void SetBoardTestMode(uint8_t mode)
 {
 	Function_Select = mode;
-	OLED_ShowString(0,6, ASCII12x8, "       ");	 // x, y, ASCII_size, string
-	OLED_ShowString(0,7, ASCII12x8, "       ");	
+	OLED_ShowString(0,6, ASCII12x8, "       ");	 // 擦除左下角的SPo2和HR信息
+	OLED_ShowString(0,7, ASCII12x8, "       ");
 
-	if(Function_Select == FUNCTION_ECG )      {  OLED_ShowString(48,0, ASCII16x16, "ECG ");  }
-	else if(Function_Select == FUNCTION_PPG ) {  OLED_ShowString(48,0, ASCII16x16, "PPG ");  }
+	if(Function_Select == FUNCTION_ECG )      {  OLED_ShowString(48,0, ASCII16x16, "ECG ");  }  // 第0行第48列
+	else if(Function_Select == FUNCTION_PPG ) {  OLED_ShowString(48,0, ASCII16x16, "PPG ");  }	// x, y, ASCII_size, string
 	else if(Function_Select == FUNCTION_GSR ) {  OLED_ShowString(48,0, ASCII16x16, "GSR ");  }
 	else                                      {  OLED_ShowString(48,0, ASCII16x16, "SPo2");  }
 

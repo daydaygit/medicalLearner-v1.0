@@ -53,13 +53,23 @@
                                      
 /** 
   * @brief  Output Maximum frequency selection  
+  *I/O口的输出模式下，有3种输出速度可选(2MHz、10MHz和50MHz)，
+  * 这个速度是指I/O口驱动电路的响应速度而不是输出信号的速度,
+  * 输出信号的速度与程序有关（芯片内部在I/O口 的输出部分安排了多个响应速度不同的输出驱动电路，用户可以根据自己的需要选择合适的驱动电路）.
+  *
+  * 通过选择速度来选择不同的输出驱动模块，达到最佳的噪声 控制和降低功耗的目的。
+  * 高频的驱动电路，噪声也高，当不需要高的输出频率时，请选用低频驱动电路，这样非常有利于提高系统的EMI性能。
+  * 当然如果要输出较高频率的信号，但却选用了较低频率的驱动模块，很可能会得到失真的输出信号。
+  * 关键是GPIO的引脚速度跟应用匹配（推荐10倍以上？）。比如：
+  *     对于串     口，假如最大波特率只需115.2k，那么用2M的GPIO的引脚速度就够了，既省电也噪声小。
+  *     对于I2C接口，假如使用400k波特率，若想把余量留大些，那么用2M的GPIO的引脚速度或许不够，这时可以选用10M的GPIO引脚速度。
+  *     对于SPI接口，假如使用18M或9M波特率，用10M的GPIO的引脚速度显然不够了，需要选用50M的GPIO的引脚速度。
   */
-
 typedef enum
 { 
-  GPIO_Speed_10MHz = 1,
-  GPIO_Speed_2MHz, 
-  GPIO_Speed_50MHz
+  GPIO_Speed_10MHz = 1,		/* 最高输出速率10MHz */
+  GPIO_Speed_2MHz, 			/* 最高输出速率2MHz   */
+  GPIO_Speed_50MHz			/* 最高输出速率50MHz */
 } GPIOSpeed_TypeDef;
 
 #define IS_GPIO_SPEED(SPEED) (((SPEED) == GPIO_Speed_10MHz) || ((SPEED) == GPIO_Speed_2MHz) || \
@@ -69,14 +79,14 @@ typedef enum
   * @brief  Configuration Mode enumeration  
   */
 typedef enum
-{ GPIO_Mode_AIN         = 0x0,
-  GPIO_Mode_IN_FLOATING = 0x04,
-  GPIO_Mode_IPD         = 0x28,
-  GPIO_Mode_IPU         = 0x48,
-  GPIO_Mode_Out_OD      = 0x14,
-  GPIO_Mode_Out_PP      = 0x10,
-  GPIO_Mode_AF_OD       = 0x1C,
-  GPIO_Mode_AF_PP       = 0x18
+{ GPIO_Mode_AIN         = 0x0,		/* 模拟输入*/
+  GPIO_Mode_IN_FLOATING = 0x04,		/* 浮空输入*/
+  GPIO_Mode_IPD         = 0x28,		/* 下拉输入*/
+  GPIO_Mode_IPU         = 0x48,		/* 上拉输入*/
+  GPIO_Mode_Out_OD      = 0x14,		/* 开漏输出*/
+  GPIO_Mode_Out_PP      = 0x10,		/* 推挽输出*/
+  GPIO_Mode_AF_OD       = 0x1C,		/* 复用开漏输出*/
+  GPIO_Mode_AF_PP       = 0x18		/* 复用推挽输出*/
 } GPIOMode_TypeDef;
 
 #define IS_GPIO_MODE(MODE) (((MODE) == GPIO_Mode_AIN) || ((MODE) == GPIO_Mode_IN_FLOATING) || \
@@ -91,14 +101,14 @@ typedef enum
 typedef struct
 {
   uint16_t GPIO_Pin;             /*!< Specifies the GPIO pins to be configured.
-                                      This parameter can be any value of @ref GPIO_pins_define */
+                                                               This parameter can be any value of @ref GPIO_pins_define */
 
   GPIOSpeed_TypeDef GPIO_Speed;  /*!< Specifies the speed for the selected pins.
-                                      This parameter can be a value of @ref GPIOSpeed_TypeDef */
+                                                               This parameter can be a value of @ref GPIOSpeed_TypeDef */
 
   GPIOMode_TypeDef GPIO_Mode;    /*!< Specifies the operating mode for the selected pins.
-                                      This parameter can be a value of @ref GPIOMode_TypeDef */
-}GPIO_InitTypeDef;
+                                                               This parameter can be a value of @ref GPIOMode_TypeDef */
+} GPIO_InitTypeDef;
 
 
 /** 

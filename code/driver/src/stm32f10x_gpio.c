@@ -163,8 +163,8 @@ void GPIO_AFIODeInit(void)
 }
 
 /**
-  * @brief  Initializes the GPIOx peripheral according to the specified
-  *         parameters in the GPIO_InitStruct.
+  * @brief    Initializes the GPIOx peripheral according to the specified
+  *              parameters in the GPIO_InitStruct.
   * @param  GPIOx: where x can be (A..G) to select the GPIO peripheral.
   * @param  GPIO_InitStruct: pointer to a GPIO_InitTypeDef structure that
   *         contains the configuration information for the specified GPIO peripheral.
@@ -175,8 +175,7 @@ void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
   uint32_t currentmode = 0x00, currentpin = 0x00, pinpos = 0x00, pos = 0x00;
   uint32_t tmpreg = 0x00, pinmask = 0x00;
 
-  /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));                   /* Check the parameters */
   assert_param(IS_GPIO_MODE(GPIO_InitStruct->GPIO_Mode));
   assert_param(IS_GPIO_PIN(GPIO_InitStruct->GPIO_Pin));  
   
@@ -184,39 +183,34 @@ void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
   currentmode = ((uint32_t)GPIO_InitStruct->GPIO_Mode) & ((uint32_t)0x0F);
   if ((((uint32_t)GPIO_InitStruct->GPIO_Mode) & ((uint32_t)0x10)) != 0x00)
   { 
-    assert_param(IS_GPIO_SPEED(GPIO_InitStruct->GPIO_Speed));    /* Check the parameters */
+    assert_param(IS_GPIO_SPEED(GPIO_InitStruct->GPIO_Speed));	/* Check the parameters */
 
-    currentmode |= (uint32_t)GPIO_InitStruct->GPIO_Speed;        /* Output mode */
+    currentmode |= (uint32_t)GPIO_InitStruct->GPIO_Speed;		/* Output mode */
   }
 
-  /* GPIO CRL Configuration */
-  /* Configure the eight low port pins */
+/*---------------------------- GPIO CRL Configuration ------------------------*/
+/* Configure the eight low port pins */
   if (((uint32_t)GPIO_InitStruct->GPIO_Pin & ((uint32_t)0x00FF)) != 0x00)
   {
     tmpreg = GPIOx->CRL;
     for (pinpos = 0x00; pinpos < 0x08; pinpos++)
     {
       pos = ((uint32_t)0x01) << pinpos;
-      /* Get the port pins position */
-      currentpin = (GPIO_InitStruct->GPIO_Pin) & pos;
+
+      currentpin = (GPIO_InitStruct->GPIO_Pin) & pos;			/* Get the port pins position */
       if (currentpin == pos)
       {
         pos = pinpos << 2;
-        /* Clear the corresponding low control register bits */
-        pinmask = ((uint32_t)0x0F) << pos;
+
+        pinmask = ((uint32_t)0x0F) << pos;						/* Clear the corresponding low control register bits */
         tmpreg &= ~pinmask;
-        /* Write the mode configuration in the corresponding bits */
-        tmpreg |= (currentmode << pos);
-        /* Reset the corresponding ODR bit */
-        if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPD)
-        {
+
+        tmpreg |= (currentmode << pos);							/* Write the mode configuration in the corresponding bits */
+
+        if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPD) {	    /* Reset the corresponding ODR bit */
           GPIOx->BRR = (((uint32_t)0x01) << pinpos);
-        }
-        else
-        {
-          /* Set the corresponding ODR bit */
-          if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPU)
-          {
+        } else {
+          if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPU) {	/* Set the corresponding ODR bit */
             GPIOx->BSRR = (((uint32_t)0x01) << pinpos);
           }
         }
@@ -224,6 +218,7 @@ void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
     }
     GPIOx->CRL = tmpreg;
   }
+
 /*---------------------------- GPIO CRH Configuration ------------------------*/
   /* Configure the eight high port pins */
   if (GPIO_InitStruct->GPIO_Pin > 0x00FF)
@@ -232,24 +227,22 @@ void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
     for (pinpos = 0x00; pinpos < 0x08; pinpos++)
     {
       pos = (((uint32_t)0x01) << (pinpos + 0x08));
-      /* Get the port pins position */
-      currentpin = ((GPIO_InitStruct->GPIO_Pin) & pos);
+
+      currentpin = ((GPIO_InitStruct->GPIO_Pin) & pos);				/* Get the port pins position */
       if (currentpin == pos)
       {
         pos = pinpos << 2;
-        /* Clear the corresponding high control register bits */
-        pinmask = ((uint32_t)0x0F) << pos;
+
+        pinmask = ((uint32_t)0x0F) << pos;							/* Clear the corresponding high control register bits */
         tmpreg &= ~pinmask;
-        /* Write the mode configuration in the corresponding bits */
-        tmpreg |= (currentmode << pos);
-        /* Reset the corresponding ODR bit */
-        if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPD)
-        {
+
+        tmpreg |= (currentmode << pos);								/* Write the mode configuration in the corresponding bits */
+
+        if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPD) {			/* Reset the corresponding ODR bit */
           GPIOx->BRR = (((uint32_t)0x01) << (pinpos + 0x08));
         }
-        /* Set the corresponding ODR bit */
-        if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPU)
-        {
+
+        if (GPIO_InitStruct->GPIO_Mode == GPIO_Mode_IPU) {			/* Set the corresponding ODR bit */
           GPIOx->BSRR = (((uint32_t)0x01) << (pinpos + 0x08));
         }
       }
@@ -361,7 +354,7 @@ void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
   assert_param(IS_GPIO_ALL_PERIPH(GPIOx));  /* Check the parameters */
   assert_param(IS_GPIO_PIN(GPIO_Pin));
   
-  GPIOx->BSRR = GPIO_Pin;
+  GPIOx->BSRR = GPIO_Pin;					/* 端口位设置/清除寄存器(GPIOx_BSRR) (x=A..E) */
 }
 
 /**
@@ -550,52 +543,33 @@ void GPIO_PinRemapConfig(uint32_t GPIO_Remap, FunctionalState NewState)
 {
   uint32_t tmp = 0x00, tmp1 = 0x00, tmpreg = 0x00, tmpmask = 0x00;
 
-  /* Check the parameters */
-  assert_param(IS_GPIO_REMAP(GPIO_Remap));
+  assert_param(IS_GPIO_REMAP(GPIO_Remap));          /* Check the parameters */
   assert_param(IS_FUNCTIONAL_STATE(NewState));  
   
-  if((GPIO_Remap & 0x80000000) == 0x80000000)
-  {
-    tmpreg = AFIO->MAPR2;
-  }
-  else
-  {
-    tmpreg = AFIO->MAPR;
-  }
+  if((GPIO_Remap & 0x80000000) == 0x80000000)  {  tmpreg = AFIO->MAPR2;  }
+  else                                         {  tmpreg = AFIO->MAPR;   }
 
   tmpmask = (GPIO_Remap & DBGAFR_POSITION_MASK) >> 0x10;
   tmp = GPIO_Remap & LSB_MASK;
 
-  if ((GPIO_Remap & (DBGAFR_LOCATION_MASK | DBGAFR_NUMBITS_MASK)) == (DBGAFR_LOCATION_MASK | DBGAFR_NUMBITS_MASK))
-  {
-    tmpreg &= DBGAFR_SWJCFG_MASK;
-    AFIO->MAPR &= DBGAFR_SWJCFG_MASK;
-  }
-  else if ((GPIO_Remap & DBGAFR_NUMBITS_MASK) == DBGAFR_NUMBITS_MASK)
-  {
-    tmp1 = ((uint32_t)0x03) << tmpmask;
-    tmpreg &= ~tmp1;
-    tmpreg |= ~DBGAFR_SWJCFG_MASK;
-  }
-  else
-  {
-    tmpreg &= ~(tmp << ((GPIO_Remap >> 0x15)*0x10));
-    tmpreg |= ~DBGAFR_SWJCFG_MASK;
+  if ((GPIO_Remap & (DBGAFR_LOCATION_MASK | DBGAFR_NUMBITS_MASK)) == (DBGAFR_LOCATION_MASK | DBGAFR_NUMBITS_MASK)) {
+      tmpreg &= DBGAFR_SWJCFG_MASK;
+      AFIO->MAPR &= DBGAFR_SWJCFG_MASK;
+  } else if ((GPIO_Remap & DBGAFR_NUMBITS_MASK) == DBGAFR_NUMBITS_MASK) {
+     tmp1 = ((uint32_t)0x03) << tmpmask;
+     tmpreg &= ~tmp1;
+     tmpreg |= ~DBGAFR_SWJCFG_MASK;
+  } else {
+     tmpreg &= ~(tmp << ((GPIO_Remap >> 0x15)*0x10));
+     tmpreg |= ~DBGAFR_SWJCFG_MASK;
   }
 
-  if (NewState != DISABLE)
-  {
-    tmpreg |= (tmp << ((GPIO_Remap >> 0x15)*0x10));
+  if (NewState != DISABLE) {
+     tmpreg |= (tmp << ((GPIO_Remap >> 0x15)*0x10));
   }
 
-  if((GPIO_Remap & 0x80000000) == 0x80000000)
-  {
-    AFIO->MAPR2 = tmpreg;
-  }
-  else
-  {
-    AFIO->MAPR = tmpreg;
-  }  
+  if((GPIO_Remap & 0x80000000) == 0x80000000)  {    AFIO->MAPR2 = tmpreg;  }
+  else                                         {    AFIO->MAPR = tmpreg;   }  
 }
 
 /**

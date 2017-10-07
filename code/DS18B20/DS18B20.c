@@ -57,7 +57,6 @@ char Init18b20 (void)
 {
 	char ret = 0;
 	
-	
 	GPIO_SetBits(GPIOA , DS18B20); //数据线置高电平
 	delay_us(2); //延时2微秒
 	GPIO_ResetBits(GPIOA , DS18B20);	//置低
@@ -73,6 +72,7 @@ char Init18b20 (void)
 	
 	return ret;
 }
+
 /************************************************************
 *Function:向18B20写入一个字节
 *parameter:
@@ -196,6 +196,7 @@ void ReadID (void)//读取器件 id
 int ReadTemperature(void)
 {
   	int temp = 0;
+
   	ReadID();
   	Config18b20();
 	Init18b20 ();

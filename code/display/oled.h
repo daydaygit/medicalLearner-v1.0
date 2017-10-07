@@ -1,23 +1,25 @@
 #ifndef __OLED_H
 #define __OLED_H			  	 
 #include "stm32_ioport.h"
+
 //0:4线串行模式
-#define ASCII12x8  	6  //一个英文ascii码点整个数*8
-#define ASCII16x16  16
-#define ASCII24x24 	36
-#define ASCII32x32 	64
+#define ASCII12x8  	  6     //一个英文ascii码点整个数*8
+#define ASCII16x16   16
+#define ASCII24x24 	 36
+#define ASCII32x32 	 64
 
 #define X_WIDTH 	128
-#define Y_WIDTH 	64	    						  
+#define Y_WIDTH 	 64	
+
 //-----------------OLED端口定义----------------  					   
-#define OLED_CS_Clr()  GPIO_ResetBits(GPIOB,GPIO_Pin_0)//CS
-#define OLED_CS_Set()  GPIO_SetBits(GPIOB,GPIO_Pin_0)
+#define OLED_CS_Clr()   GPIO_ResetBits(GPIOB,GPIO_Pin_0)//CS
+#define OLED_CS_Set()   GPIO_SetBits(GPIOB,GPIO_Pin_0)
 
-#define OLED_DC_Clr() GPIO_ResetBits(GPIOB,GPIO_Pin_1)//DC
-#define OLED_DC_Set() GPIO_SetBits(GPIOB,GPIO_Pin_1)
+#define OLED_DC_Clr()   GPIO_ResetBits(GPIOB,GPIO_Pin_1)//DC
+#define OLED_DC_Set()   GPIO_SetBits(GPIOB,GPIO_Pin_1)
 
-#define OLED_RST_Clr() GPIO_ResetBits(GPIOB,GPIO_Pin_3)//RES
-#define OLED_RST_Set() GPIO_SetBits(GPIOB,GPIO_Pin_3)
+#define OLED_RST_Clr()  GPIO_ResetBits(GPIOB,GPIO_Pin_3)//RES
+#define OLED_RST_Set()  GPIO_SetBits(GPIOB,GPIO_Pin_3)
 
 #define OLED_SDIN_Clr() GPIO_ResetBits(GPIOB,GPIO_Pin_4)//DIN
 #define OLED_SDIN_Set() GPIO_SetBits(GPIOB,GPIO_Pin_4)

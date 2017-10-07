@@ -51,7 +51,8 @@ int main(void)
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	/* Æô¶¯ GPIOAÊ±ÖÓ */
 
 	USART_Config(115200);                                   /* ´®¿ÚÅäÖÃ*/ 
-	OLED_Init();			                                //³õÊ¼»¯OLED : SSD1306
+
+	OLED_Init();			                                //³õÊ¼»¯OLED : SSD1306 (128 x 64 µãÕó)
 	OLED_Clear();
 
 	SetBoardTestMode(FUNCTION_SPO2);	                    /*Ä¬ÈÏÎªÑªÑõÄ£Ê½*/
@@ -60,8 +61,7 @@ int main(void)
 
 	MLX90614_Init();                                        /*³õÊ¼»¯MLX90614: Melexis MLX90614ºìÍâÎÂ¶È*/
 
-	InitMax30100();                                         /*³õÊ¼»¯Max30100*/
-
+	InitMax30100();                                         /*³õÊ¼»¯Max30100:  Âö²«ÑªÑõ±¥ºÍ¡¢ÐÄÂÊ´«¸ÐÆ÷*/
 	ReadMax30100Status(&IntStatus);                         /*Çå³ýMax30100ÖÐ¶Ï*/
 	EXTI_ClearITPendingBit(EXTI_Line12);                    //??? 
 
@@ -77,14 +77,13 @@ int main(void)
 
 	ADC1_Init();                                            /*ECG¡¢PPG¡¢GSR³õÊ¼»¯*/
 
-	BeepControl(ON);                                        /*  ·äÃùÆ÷ÏìÒ»Éù*/
+	BeepControl(ON);                                        /*  <B7><E4><C3><F9><C6><F7><CF><EC>¿<C9><F9>*/
 	delay_ms(500);
 	BeepControl(OFF);
 
 	while(1)
 	{		
-		if( I2ComError_Flag == 1 )                          //I2CÍ¨Ñ¶´íÎó£¬ÖØÐÂÅäÖÃMax30100
-		{
+		if( I2ComError_Flag == 1 ) {                         //I2CÍ¨Ñ¶´íÎó£¬ÖØÐÂÅäÖÃMax30100
 			ResetI2c();
 			InitMax30100();
 			ReadMax30100Status(&IntStatus);
@@ -119,7 +118,7 @@ void InitBeep()
 
 	GPIO_InitStructure.GPIO_Pin   = BEEP  ;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;  /*  ÍÆÍìÊä³ö*/
 
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
@@ -134,17 +133,16 @@ void InitKeyPad()
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	/* ´ò¿ªGPIOÊ±ÖÓ */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	   /* ´ò¿ªGPIOÊ±ÖÓ            */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);	
 
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;	           /* ¿ªÂ©Êä³öÄ£Ê½ */
-	
-	GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_8 | GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;	           /* ÉÏÀ­ÊäÈë                    */
+	GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_8 | GPIO_Pin_15;  /* PA8:S2(ECG),  PA15: S3(PPG) */
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_8 | GPIO_Pin_9;
+	GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_8 | GPIO_Pin_9;   /* PB8:S4(GSR),  PB9: S5(x)       */
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
@@ -153,8 +151,8 @@ void InitKeyPad()
 *******************************************************************************/
 void TIM2_IRQHandler(void)
 {
-	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {  //¼ì²âÖÆ¶¨µÄÖÐ¶ÏÊÇ·ñ·¢Éú
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);    //Çå³ýÖÐ¶Ï´¦ÀíÎ»¡£	
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {	//¼ì²âÖÆ¶¨µÄÖÐ¶ÏÊÇ·ñ·¢Éú
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);		//Çå³ýÖÐ¶Ï´¦ÀíÎ»¡£	
 		ShowTemperature();
 		KeyPadProcess();
 	}
@@ -164,13 +162,13 @@ void TimerInit(void)
 {	//10ms
 	/***772MÏÂ¶¨Ê±ÖµµÄ¼ÆËã£¨£¨1+Ô¤·ÖÆµTIM_Prescaler£©/72*(1+¶¨Ê±ÖÜÆÚTIM_Period)£©*/
 
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //ÅäÖÃRCC£¬Ê¹ÄÜTIMx
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);          //ÅäÖÃRCC£¬Ê¹ÄÜTIM2
 
 	/* Time Base configuration */
 	TIM_TimeBaseStructure.TIM_Prescaler     = 7199;               //Ê±ÖÓÔ¤·ÖÆµÊý ÀýÈç:Ê±ÖÓÆµÂÊ=72/(Ê±ÖÓÔ¤·ÖÆµ+1)  
 	TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up; //¶¨Ê±Æ÷Ä£Ê½ ÏòÉÏ¼ÆÊý  
 	TIM_TimeBaseStructure.TIM_Period        = 99;                 //×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷ÖÜÆÚµÄÖµ(¶¨Ê±Ê±¼ä)
-	//ÀÛ¼Æ 0xFFFF¸öÆµÂÊºó²úÉú¸ö¸üÐÂ»òÕßÖÐ¶Ï(Ò²ÊÇËµ¶¨Ê±Ê±¼äµ½) 3s
+                                                                  //ÀÛ¼Æ 0xFFFF¸öÆµÂÊºó²úÉú¸ö¸üÐÂ»òÕßÖÐ¶Ï(Ò²ÊÇËµ¶¨Ê±Ê±¼äµ½) 3s
 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;                  //Ê±¼ä·Ö¸îÖµ  
 
 	//TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
@@ -225,9 +223,9 @@ void RCC_Configuration(void)
 	}
 }
 
-void EXTI15_10_IRQHandler(void)         //???:EXTI15_10 (??????10~15??????)  
+void EXTI15_10_IRQHandler(void)            //???:EXTI15_10 (??????10~15??????)  
 {
-   if(EXTI_GetITStatus(EXTI_Line12) != RESET) //?????????????????,??????????  
+   if(EXTI_GetITStatus(EXTI_Line12) != RESET)    //?????????????????,??????????  
    {  
       Max30102_INT_Flag = 1;
       EXTI_ClearITPendingBit(EXTI_Line12);       //???  
@@ -235,7 +233,7 @@ void EXTI15_10_IRQHandler(void)         //???:EXTI15_10 (??????10~15??????)
 
       if( ReadMax30100FifoLength(&SampleLen) == Success) {
          if( SampleLen > 0  ) {
-            if( ReadMax30100FifoBuf(Max30102DataBuf,SampleLen) == Success ) {//102 ¸ö×Ö½ÚÒ»×é
+            if( ReadMax30100FifoBuf(Max30102DataBuf,SampleLen) == Success ) {  //102 ¸ö×Ö½ÚÒ»×é
                 if(Function_Select == FUNCTION_SPO2 ) {
 #ifndef FOR_ANDROID
                     SendDataToPc(Max30102DataBuf,SampleLen*6);
@@ -244,6 +242,6 @@ void EXTI15_10_IRQHandler(void)         //???:EXTI15_10 (??????10~15??????)
                 }
             }
          }
-      }         
-   }  
-} 	
+      }
+   }
+}
