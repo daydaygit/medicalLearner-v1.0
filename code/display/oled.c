@@ -29,14 +29,14 @@ u8 OLED_GRAM[128][8];
 //cmd:数据/命令标志 
 //      0: 命令;
 //      1: 数据;
-void OLED_WR_Byte(u8 dat,u8 cmd)                        // 4-wire SPI write
+void OLED_WR_Byte(u8 dat,u8 cmd)          // 4-wire SPI write
 {	
 	u8 i;			  
 
-	if(cmd)   {   OLED_DC_Set();   }                // 数据,则B1_DC = H
-	else      {   OLED_DC_Clr();   }                // 命令,则B1_DC = L
+	if(cmd)   {   OLED_DC_Set();   }            // 数据,则B1_DC = H
+	else      {   OLED_DC_Clr();   }            // 命令,则B1_DC = L
 
-	OLED_CS_Clr();                                  // B0_CS = L                        //先设置DC，再设置CS
+	OLED_CS_Clr();                              // B0_CS = L                        //先设置DC，再设置CS
 
 	for(i=0;i<8;i++)
 	{  
@@ -50,8 +50,8 @@ void OLED_WR_Byte(u8 dat,u8 cmd)                        // 4-wire SPI write
 		dat<<=1;   
 	}
 
-	OLED_CS_Set();                                  // B0_CS  = H                      //先设置CSCS，再设置DC
-	OLED_DC_Set();                                  // B1_DC  = H
+	OLED_CS_Set();                              // B0_CS  = H                      //先设置CSCS，再设置DC
+	OLED_DC_Set();                              // B1_DC  = H	  
 } 
 
 void OLED_Set_Pos(u8 x, u8 y) 

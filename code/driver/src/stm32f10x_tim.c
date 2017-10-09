@@ -234,38 +234,27 @@ void TIM_TimeBaseInit(TIM_TypeDef* TIMx, TIM_TimeBaseInitTypeDef* TIM_TimeBaseIn
 
   tmpcr1 = TIMx->CR1;  
 
-  if((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM2) || (TIMx == TIM3)||
-     (TIMx == TIM4) || (TIMx == TIM5)) 
+  if((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM2) || (TIMx == TIM3)|| (TIMx == TIM4) || (TIMx == TIM5)) 
   {
     /* Select the Counter Mode */
     tmpcr1 &= (uint16_t)(~((uint16_t)(TIM_CR1_DIR | TIM_CR1_CMS)));
     tmpcr1 |= (uint32_t)TIM_TimeBaseInitStruct->TIM_CounterMode;
   }
  
-  if((TIMx != TIM6) && (TIMx != TIM7))
-  {
-    /* Set the clock division */
+  if((TIMx != TIM6) && (TIMx != TIM7)) {                         /* Set the clock division */
     tmpcr1 &= (uint16_t)(~((uint16_t)TIM_CR1_CKD));
     tmpcr1 |= (uint32_t)TIM_TimeBaseInitStruct->TIM_ClockDivision;
   }
 
   TIMx->CR1 = tmpcr1;
-
-  /* Set the Autoreload value */
-  TIMx->ARR = TIM_TimeBaseInitStruct->TIM_Period ;
- 
-  /* Set the Prescaler value */
-  TIMx->PSC = TIM_TimeBaseInitStruct->TIM_Prescaler;
+  TIMx->ARR = TIM_TimeBaseInitStruct->TIM_Period ;                /* Set the Autoreload value */
+  TIMx->PSC = TIM_TimeBaseInitStruct->TIM_Prescaler;              /* Set the Prescaler value   */
     
-  if ((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM15)|| (TIMx == TIM16) || (TIMx == TIM17))  
-  {
-    /* Set the Repetition Counter value */
-    TIMx->RCR = TIM_TimeBaseInitStruct->TIM_RepetitionCounter;
+  if ((TIMx == TIM1) || (TIMx == TIM8)|| (TIMx == TIM15)|| (TIMx == TIM16) || (TIMx == TIM17)) {
+    TIMx->RCR = TIM_TimeBaseInitStruct->TIM_RepetitionCounter;    /* Set the Repetition Counter value */
   }
 
-  /* Generate an update event to reload the Prescaler and the Repetition counter
-     values immediately */
-  TIMx->EGR = TIM_PSCReloadMode_Immediate;           
+  TIMx->EGR = TIM_PSCReloadMode_Immediate;   /* Generate an update event to reload the Prescaler and the Repetition counter values immediately */
 }
 
 /**
@@ -805,19 +794,11 @@ void TIM_BDTRStructInit(TIM_BDTRInitTypeDef* TIM_BDTRInitStruct)
   */
 void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState)
 {
-  /* Check the parameters */
-  assert_param(IS_TIM_ALL_PERIPH(TIMx));
+  assert_param(IS_TIM_ALL_PERIPH(TIMx));         /* Check the parameters */
   assert_param(IS_FUNCTIONAL_STATE(NewState));
   
-  if (NewState != DISABLE)
-  {
-    /* Enable the TIM Counter */
-    TIMx->CR1 |= TIM_CR1_CEN;
-  }
-  else
-  {
-    /* Disable the TIM Counter */
-    TIMx->CR1 &= (uint16_t)(~((uint16_t)TIM_CR1_CEN));
+  if (NewState != DISABLE) {  TIMx->CR1 |= TIM_CR1_CEN;  }                           /* Enable the TIM Counter */
+  else                     {  TIMx->CR1 &= (uint16_t)(~((uint16_t)TIM_CR1_CEN));    /* Disable the TIM Counter */
   }
 }
 
@@ -871,21 +852,13 @@ void TIM_CtrlPWMOutputs(TIM_TypeDef* TIMx, FunctionalState NewState)
   */
 void TIM_ITConfig(TIM_TypeDef* TIMx, uint16_t TIM_IT, FunctionalState NewState)
 {  
-  /* Check the parameters */
-  assert_param(IS_TIM_ALL_PERIPH(TIMx));
+
+  assert_param(IS_TIM_ALL_PERIPH(TIMx));                           /* Check the parameters          */
   assert_param(IS_TIM_IT(TIM_IT));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
   
-  if (NewState != DISABLE)
-  {
-    /* Enable the Interrupt sources */
-    TIMx->DIER |= TIM_IT;
-  }
-  else
-  {
-    /* Disable the Interrupt sources */
-    TIMx->DIER &= (uint16_t)~TIM_IT;
-  }
+  if (NewState != DISABLE) {  TIMx->DIER |= TIM_IT;             }  /* Enable the Interrupt sources  */
+  else                     {  TIMx->DIER &= (uint16_t)~TIM_IT;  }  /* Disable the Interrupt sources */
 }
 
 /**
