@@ -2,9 +2,27 @@
 #include "oled.h"
 #include "uart.h"
 
+#ifdef FUNC_OLED_QXY
+//最好是使用extern函数，不要include.h文件，这样生成的bin就小一些
+#include "stdio.h"					// sprintf
+#include "string.h"					// memcpy
+
+//#include "DS18B20.h"				// ReadTemperature
+extern int ReadTemperature(void);
+
+//#include "MLX90614.h"				// SMBus_ReadTemp
+extern int SMBus_ReadTemp(void);
+
+//#include "usbio.h"					// USB_SendData
+extern uint32_t USB_SendData(uint8_t *data,uint32_t dataNum);
+
+//extern void maxim_heart_rate_and_oxygen_saturation(uint32_t *pun_ir_buffe, int32_t n_ir_buffer_length, uint32_t *pun_red_buffer, int32_t *pn_spo2, int8_t *pch_spo2_valid, int32_t *pn_heart_rate, int8_t *pch_hr_valid);
+#endif
+
 #define MAX_BRIGHTNESS      255
 #define CAL_SAMPLE_SIZE     500
 #define CAL_HR_SIZE         400
+
 
 const u8 BMP_Buf[] = {0xF8,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,
                       0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xF8,
@@ -16,11 +34,11 @@ static uint8_t 	Yvalue=0;
 static uint8_t 	YvaluePre=0;
 extern uint8_t 	DrawCount;
 
-int16_t  BiaArray [400];
+int16_t  BiaArray [CAL_HR_SIZE];	// 400
 
 /*******************心率 SpO2计算**************************/
-uint32_t aun_ir_buffer[CAL_SAMPLE_SIZE];		//IR lED传感器数据
-uint32_t aun_red_buffer[CAL_SAMPLE_SIZE];		//红灯传感器数据
+uint32_t aun_ir_buffer[CAL_SAMPLE_SIZE];		//IR lED传感器数据.数组大小=500
+uint32_t aun_red_buffer[CAL_SAMPLE_SIZE];		//红灯传感器数据.数组大小=500
 __IO int32_t  n_sp02;							//SPO2 数据
 __IO int8_t   ch_spo2_valid;					// SP02 计算值有效d
 __IO int32_t  n_heart_rate;						//心率计算值
@@ -294,15 +312,35 @@ void Caculate_HR_SpO2(uint8_t * DataBuf,uint8_t dataLen)
 	}
 }
 
+
+void print_picture(void)
+{
+    OLED_DrawBMP(10,1,115,8, BMP_Test_Buf);
+}
+
+void print_logo(u8 logoVer)
+{
+	static char runone = 1;
+
+	if(runone) {
+		runone = 0;
+
+		OLED_Clear();
+	}
+
+	OLED_Show_logo_str(logoVer);
+}
+
 void ShowHeart(u8 show)
 {
-	if( show == 1 ) {   OLED_DrawBMP(0,6,16,8, BMP_Buf);  }  // u8 x0, u8 y0,u8 x1, u8 y1,const u8 BMP[]
-	else            {  OLED_ClearBMP(0,6,16,8);           } 
+	if( show == 1 ) {    OLED_DrawBMP(0,6,16,8, BMP_Buf);  }  // u8 x0, u8 y0,u8 x1, u8 y1,const u8 BMP[]     page:6~8, cul:0~16
+	else            {   OLED_ClearBMP(0,6,16,8);           } 
 }
 
 void SetBoardTestMode(uint8_t mode)
 {
 	Function_Select = mode;
+
 	OLED_ShowString(0,6, ASCII12x8, "       ");	 // 擦除左下角的SPo2和HR信息
 	OLED_ShowString(0,7, ASCII12x8, "       ");
 
@@ -385,6 +423,7 @@ int16_t GetSubArray(int16_t * pn_buf,int16_t n_size,int16_t n_start,int16_t n_le
 {
 	int16_t i = 0;
 	int16_t Len =  (n_len <= (n_size - n_start) ? n_len : (n_size - n_start));
+
 	for(i=0;i<Len;i++)
     {
         pn_out[i] = pn_buf[i+n_start];
@@ -405,29 +444,42 @@ int16_t CaculateHR_PPG()
 	int16_t i,j,k;
 	int16_t thr,thr2;
 	int16_t meanRR;
-	
+
+	/*
+	 *  BiaArray[400]		:
+	 *  aun_ir_buffer[500]	:  
+	 *  aun_red_buffer[500]	:
+	 */
+
+	// 1. 将数组aun_ir_buffer中相邻数据的差值存放到BiaArray[], 并记录最大差值的7倍
 	for(i=0;i<CAL_HR_SIZE-1;i++)
 	{
-		BiaArray[i]=aun_ir_buffer[i+1]-aun_ir_buffer[i];
+		BiaArray[i]=aun_ir_buffer[i+1]-aun_ir_buffer[i];		//0 ~ 400个数据前后相互减,将差值数据存放到数组BiaArray
 	}
 	
-	thr=GetMax(BiaArray,CAL_HR_SIZE-1);
-	thr2=thr*7;
-	
-	for(i=0,j=0;i<CAL_HR_SIZE-1;i++)
+	thr=GetMax(BiaArray,CAL_HR_SIZE-1);							// 获取差值数组中最大的数，即获取其中最大的差值
+	thr2=thr*7;													// 最大差值的7倍
+
+	// 2. 标记BiaArray[]中差值的10倍大于thr2(aun_red_buffer[]对应下标值1，否则值0.  所以,标1的aun_ir_buffer对应数据差值较大)
+	for(i=0,j=0;i<CAL_HR_SIZE-1;i++)							// 0 ~ 398
 	{
-		if( BiaArray[i]*10>thr2) {  aun_red_buffer[j++] = 1;  }
-		else                     {  aun_red_buffer[j++] = 0;  }
-	}
-	
-	for(i=0,k=0;i<j-1;i++)
-	{
-		if (aun_red_buffer[i+1] - aun_red_buffer[i] == 1)  {  BiaArray[k++] = i;  }
+		if( BiaArray[i]*10>thr2) {  aun_red_buffer[j++] = 1;  }	// if 差值数组中数据a x 10 后超过最大差值的7倍，则regbuf数组增加对应下标值1
+		else                     {  aun_red_buffer[j++] = 0;  }	// j记录了满足条件的数据a的个数,i&j都一直往后递增
 	}
 
+	// 3. aun_red_buffer[]前一数据为0,后一数据为1，则记下下标.所以,BiaArray[]中现在数据全是(aun_ir_buffer)相邻数据差值大的下标值
+	for(i=0,k=0; i<j-1; i++)
+	{
+		if (aun_red_buffer[i+1] - aun_red_buffer[i] == 1) {		// red_buffer中为1表明对应下标的BiaArray的10倍超过最大差值
+			BiaArray[k++] = i;									// 此时覆盖Biaarray中数据。但有隐患是BiaArrray[i] i很大的部分可能还是以前的值!!!
+		}														// Biaarray现在k表面有多少个大差值，BiaArray[k-1]中记录aun_red_buffer[]邻差为1的下标
+	}
+
+	// 4. 如果BiaArray[]中有大于2个数据,则用最后一个数据- 第一个数据，再除以BiaArray中个数.这个什么意思?
+	//    有点像算(f(x1) - f(x0)) / (x1 -  x0), 有点像算斜率,但这里是线性的吗????
 	if( k > 1 ) {
 		meanRR=(BiaArray[k-1]-BiaArray[0])/(k-1);
-		return 6000/meanRR;
+		return (6000 / meanRR);
 	}
 
 	return 0;

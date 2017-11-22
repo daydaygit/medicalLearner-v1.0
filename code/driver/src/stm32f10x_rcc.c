@@ -1135,7 +1135,7 @@ void RCC_APB1PeriphClockCmd(uint32_t RCC_APB1Periph, FunctionalState NewState)
   /* Check the parameters */
   assert_param(IS_RCC_APB1_PERIPH(RCC_APB1Periph));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
-  if (NewState != DISABLE)  {    RCC->APB1ENR |= RCC_APB1Periph;    }
+  if(NewState != DISABLE)   {    RCC->APB1ENR |= RCC_APB1Periph;    }
   else                      {    RCC->APB1ENR &= ~RCC_APB1Periph;   }
 }
 
@@ -1157,14 +1157,8 @@ void RCC_AHBPeriphResetCmd(uint32_t RCC_AHBPeriph, FunctionalState NewState)
   assert_param(IS_RCC_AHB_PERIPH_RESET(RCC_AHBPeriph));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
 
-  if (NewState != DISABLE)
-  {
-    RCC->AHBRSTR |= RCC_AHBPeriph;
-  }
-  else
-  {
-    RCC->AHBRSTR &= ~RCC_AHBPeriph;
-  }
+  if (NewState != DISABLE)   {    RCC->AHBRSTR |= RCC_AHBPeriph;   }
+  else                       {    RCC->AHBRSTR &= ~RCC_AHBPeriph;  }
 }
 #endif /* STM32F10X_CL */ 
 

@@ -10,12 +10,11 @@ typedef enum
 typedef enum
 {
   OFF = 0,
-  ON
+  ON  = 1,
 }Status_Ctl;
 
 extern __IO uint8_t I2ComError_Flag;
 void InitMax30100I2C(void);
-
 
 
 uint8_t Max30100_WriteRegDMA(uint8_t RegName, uint8_t * pDataBuf,int Len);

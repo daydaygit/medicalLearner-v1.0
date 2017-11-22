@@ -3,6 +3,18 @@
 
 uint16_t  DS18B20;
 
+#define ds18B20_READ_ROM          0x33      // 读ROM指令
+#define ds18B20_MATCH_ROM         0x55      // 匹配ROM指令
+#define ds18B20_SKIP_ROM          0xCC      // 跳过ROM指令
+#define ds18B20_SEARCH_ROM        0xF0      // 搜索ROM指令
+#define ds18B20_ALARM_SEARCH      0xEC      // 报警搜索指令
+#define ds18B20_WRITE_SCRATCHPAD  0x4E      // 写暂存寄存器指令
+#define ds18B20_READ_SCRATCHPAD   0xBE      // 读暂存寄存器指令
+#define ds18B20_COPY_SCRATCHPAD   0x48      // 复制暂存寄存器指令
+#define ds18B20_CONVERT_T         0x44      // 启动温度转换指令
+#define ds18B20_RECALL_E2         0xB8      // 重新调出E2PROM的数据
+#define ds18B20_READ_POWER_SUPPLY 0xB4      // 读电源
+
 
 const unsigned char  CrcTable [256]={
 0,  94, 188,  226,  97,  63,  221,  131,  194,  156,  126,  32,  163,  253,  31,  65,
@@ -45,6 +57,7 @@ char ConfiureIoFor18b20(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	 //输出的最大频率为50HZ
 	GPIO_Init(GPIOA, &GPIO_InitStructure);               //初始化GPIOA端口
 	GPIO_Write(GPIOA,0xffff);                            //将GPIOA 16个端口全部置为高电平
+	return 0;
 }
 
 /************************************************************
@@ -57,18 +70,21 @@ char Init18b20 (void)
 {
 	char ret = 0;
 	
-	GPIO_SetBits(GPIOA , DS18B20); //数据线置高电平
-	delay_us(2); //延时2微秒
-	GPIO_ResetBits(GPIOA , DS18B20);	//置低
-	delay_us(490);   //delay 530 uS//80
-    GPIO_SetBits(GPIOA , DS18B20);	 //置高
-	delay_us(100);   //delay 100 uS//14
+	GPIO_SetBits(GPIOA , DS18B20);       //数据线置高电平
+	delay_us(2);                         //延时2微秒
 
-	if(GPIO_ReadInputDataBit(GPIOA , DS18B20)== 0)
-		ret = 1;   //detect 1820 success!
+	GPIO_ResetBits(GPIOA , DS18B20);     //置低
+	delay_us(490);                       //delay 530 uS//80
+
+    GPIO_SetBits(GPIOA , DS18B20);	     //置高
+	delay_us(100);                       //delay 100 uS//14
+
+	if(GPIO_ReadInputDataBit(GPIOA , DS18B20)== 0) { //detect 1820 success!
+		ret = 1;
+	}
 	
-	delay_us(480);        //延时480微秒
-	GPIO_SetBits(GPIOA , DS18B20);  //数据线置高电平
+	delay_us(480);                      //延时480微秒
+	GPIO_SetBits(GPIOA , DS18B20);      //数据线置高电平
 	
 	return ret;
 }
@@ -86,11 +102,12 @@ void WriteByte (unsigned char  wr)  //单字节写入
 	{
 		GPIO_ResetBits(GPIOA , DS18B20);	 //D18B20 = 0;
     	delay_us(2);
+
 		//D18B20=wr&0x01;
-		if(wr&0x01)	GPIO_SetBits(GPIOA , DS18B20);
-		else  GPIO_ResetBits(GPIOA , DS18B20);
+		if(wr&0x01)	  GPIO_SetBits(GPIOA , DS18B20);
+		else          GPIO_ResetBits(GPIOA , DS18B20);
+
 		delay_us(45);   //delay 45 uS //5
-		
 		GPIO_SetBits(GPIOA , DS18B20);  //D18B20=1;
 		wr >>= 1;
 	}
@@ -107,14 +124,14 @@ unsigned char ReadByte (void)     //读取单字节
 	unsigned char  i,u=0;
 	for(i=0;i<8;i++)
 	{		
-		GPIO_ResetBits(GPIOA , DS18B20);	   	//D18B20 = 0;
+		GPIO_ResetBits(GPIOA , DS18B20);     //D18B20 = 0;
 		delay_us (2);
 		u >>= 1;
 	
-		GPIO_SetBits(GPIOA , DS18B20);	 	//D18B20 = 1;
+		GPIO_SetBits(GPIOA , DS18B20);       //D18B20 = 1;
 		delay_us (4);
 		if(GPIO_ReadInputDataBit(GPIOA , DS18B20) == 1)
-		u |= 0x80;
+		   u |= 0x80;
 		delay_us (65);
 	}
 	return(u);
@@ -131,13 +148,16 @@ unsigned char ReadBytes(u8 *buf,u8 len)
 	 unsigned char  i;
 	 for(i=0;i<len;i++)
 	 {
-		  buf[i] = ReadByte();
-		 
+		  buf[i] = ReadByte();		 
 	 }
 }
 
 /************************************************************
 *Function:CRC校验
+               查表法是对0x00~0xff这256个数依次生成与每一个数对应的CRC码所组合成的表，
+               每次算一字节数据的CRC码不用经过calcrc_1byte(uchar abyte)这个函数对每个数据的
+               最低位进行判断是1还是0，而直接通过查表的方式直接提取出  crc8^*p的CRC码，
+               其运行效率相对按位运算方法更高，但是查表法所列的表却很占空间
 *parameter:
 *Return:
 *Modify:
@@ -145,8 +165,10 @@ unsigned char ReadBytes(u8 *buf,u8 len)
 unsigned char Temp_CRC (unsigned char j)
 {
    	unsigned char  i,crc_data=0;
-  	for(i=0;i<j;i++)  //查表校验
-    	crc_data = CrcTable[crc_data^temp_buff[i]];
+
+  	for(i=0; i<j; i++)
+    	crc_data = CrcTable[crc_data^temp_buff[i]];     //查表校验
+
     return (crc_data);
 }
 
@@ -161,17 +183,20 @@ unsigned char Temp_CRC (unsigned char j)
 void Config18b20 (void)  //重新配置报警限定值和分辨率
 {
      Init18b20();
-     WriteByte(0xcc);  //skip rom
-     WriteByte(0x4e);  //write scratchpad
-     WriteByte(0x19);  //上限
-     WriteByte(0x1a);  //下限
-     WriteByte(0x7f);     //set 12 bit (0.125)
+     WriteByte(0xcc);  //skip rom                 跳过ROM指令
+     WriteByte(0x4e);  //write scratchpad     写暂存寄存器指令
+     WriteByte(0x19);  //上限                 TH寄存器(暂存器的第2个字节)
+     WriteByte(0x1a);  //下限                 TL寄存器(暂存器的第3个字节)
+     WriteByte(0x7f);  //set 12 bit (0.125)
+
+
      Init18b20();
      WriteByte(0xcc);  //skip rom
-     WriteByte(0x48);  //保存设定值
+     WriteByte(0x48);  //保存设定值.48h指令将TH/TL/配置寄存器(第2/3/4字节)内容拷贝到EEPROM中
+
      Init18b20();
      WriteByte(0xcc);  //skip rom
-     WriteByte(0xb8);  //回调设定值
+     WriteByte(0xb8);  //回调设定值.b8h指令将报警触发器的值(TH/TL)、配置数据从EEPROM中拷贝回暂存器
 }
 
 /************************************************************
@@ -183,7 +208,9 @@ void Config18b20 (void)  //重新配置报警限定值和分辨率
 void ReadID (void)//读取器件 id
 {
 	Init18b20();
-	WriteByte(0x33);  //read rom
+	WriteByte(0x33);      // read rom   
+	                      // 只有在总线上只存在单只DS18B20才能使用这条命令，
+	                      // 该命令允许总线控制器在不适用搜索ROM指令的情况下读取从机的64位片序列码
 	ReadBytes(id_buff,8);
 }
 
@@ -198,29 +225,30 @@ int ReadTemperature(void)
   	int temp = 0;
 
   	ReadID();
+
   	Config18b20();
-	Init18b20 ();
-	WriteByte(0xcc);   //skip rom
-	WriteByte(0x44);   //Temperature convert
 
 	Init18b20 ();
 	WriteByte(0xcc);   //skip rom
-	WriteByte(0xbe);   //read Temperature
+	WriteByte(0x44);   //Temperature convert 温度转换
+
+	Init18b20 ();
+	WriteByte(0xcc);   //skip rom
+	WriteByte(0xbe);   //read Temperature. beh指令读取暂存器内容
 	ReadBytes (temp_buff,9);
-   if (Temp_CRC(9)==0) //校验正确
-   {
-		
-	    temp = (temp_buff[1]&0x07)*0x100 + temp_buff[0];
-		  //temp /= 16;
-		 
-		 if((temp_buff[1]&0xf8) == 0xf8 )
-		 {
-			 temp *= -1;
-		 }
-		delay_us(10);
-    }
+
+    if (Temp_CRC(9)==0) //校验正确
+    {
+       temp = (temp_buff[1]&0x07)*0x100 + temp_buff[0];
+	   //temp /= 16;
+
+       if((temp_buff[1]&0xf8) == 0xf8 ) {
+		 temp *= -1;
+	   }
+       delay_us(10);
+     }
 	 
-		return temp;
+     return temp;
 }
 
 

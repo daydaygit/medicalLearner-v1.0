@@ -211,13 +211,13 @@ void SMBus_Delay(u16 time)
 void MLX90614_Init()
 {
 // the same INIT in IIC so ...
-    GPIO_InitTypeDef    GPIO_InitStructure;
+    GPIO_InitTypeDef GPIO_InitStructure;
 
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SMBUS_PORT, ENABLE);	/* Enable SMBUS_PORT clocks */
 
-    GPIO_InitStructure.GPIO_Pin = SMBUS_SCK | SMBUS_SDA;    /*??SMBUS_SCK?SMBUS_SDA????????*/
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
+    GPIO_InitStructure.GPIO_Pin   = SMBUS_SCK | SMBUS_SDA;    /*??SMBUS_SCK?SMBUS_SDA????????*/
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_OD;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(SMBUS_PORT, &GPIO_InitStructure);
 
@@ -243,7 +243,7 @@ u16 SMBus_ReadMemory(u8 slaveAddress, u8 command)
     u8 ErrorCounter;	// Defines the number of the attempts for communication with MLX90614
 
     ErrorCounter=0x00;				// Initialising of ErrorCounter
-		slaveAddress <<= 1;	//2-7???????
+	slaveAddress <<= 1;	//2-7???????
 	
     do
     {
@@ -329,12 +329,9 @@ u8 PEC_Calculation(u8 pec[])
         while((pec[i]&(0x80>>j))==0 && i>0)
         {
             BitPosition--;
-            if(j<7)
-            {
+            if(j<7) {
                 j++;
-            }
-            else
-            {
+            } else {
                 j=0x00;
                 i--;
             }
@@ -348,25 +345,20 @@ u8 PEC_Calculation(u8 pec[])
         {
             for(i=5; i<0xFF; i--)
             {
-                if((crc[i-1]&0x80) && (i>0))
-                {
-                    temp=1;
-                }
-                else
-                {
-                    temp=0;
-                }
+                if((crc[i-1]&0x80) && (i>0))   {  temp=1;  }
+				else                           {  temp=0;  }
+
                 crc[i]<<=1;
                 crc[i]+=temp;
-            }/*End of for*/
+            }
             shift--;
-        }/*End of while*/
+        }
 
-        /*Exclusive OR between pec and crc*/
-        for(i=0; i<=5; i++)
+
+        for(i=0; i<=5; i++)        /*Exclusive OR between pec and crc*/
         {
             pec[i] ^=crc[i];
-        }/*End of for*/
+        }
     }
     while(BitPosition>8); /*End of do-while*/
 

@@ -24,6 +24,21 @@
 
 u8 OLED_GRAM[128][8];
 
+#ifdef FUNC_OLED_QXY
+/**
+ * strlen - Find the length of a string
+ * @s: The string to be sized
+ */
+u32 stringLen(const char *s)
+{
+        const char *sc;
+
+        for (sc = s; *sc != '\0'; ++sc)
+                /* nothing */;
+        return sc - s;
+}
+#endif
+
 //向SSD1106写入一个字节。
 //dat:要写入的数据/命令
 //cmd:数据/命令标志 
@@ -126,7 +141,7 @@ void OLED_ShowChar(u8 x, u8 y, u8 size, u8 chr)  // x-y: 128-64    //48, 0
 
 	} else if(size ==ASCII24x24) {
 		OLED_Set_Pos(x,y);	
-		for(i=0;i<ASCII24x24/3;i++)   // 36  / 2 = 12
+		for(i=0;i<ASCII24x24/3;i++)   // 36  / 3 = 12
 		   OLED_WR_Byte(ASCII12x24[c*ASCII24x24+i],OLED_DATA);
 
 		OLED_Set_Pos(x,y+1);
@@ -137,7 +152,7 @@ void OLED_ShowChar(u8 x, u8 y, u8 size, u8 chr)  // x-y: 128-64    //48, 0
 		for(i=0;i<ASCII24x24/3;i++)
 		   OLED_WR_Byte(ASCII12x24[c*ASCII24x24+i+2*ASCII24x24/3],OLED_DATA);
 
-	} else if(size ==ASCII16x16) { // 走的是8x16的字库
+	} else if(size ==ASCII16x16) {                                        // 走的是8x16的字库
 		OLED_Set_Pos(x,y);	
 		for(i=0;i<ASCII16x16/2;i++)   // 16 / 2 = 8     //2*8*8 二列
 		   OLED_WR_Byte(ASCII8X16[c*ASCII16x16+i],OLED_DATA);
@@ -152,6 +167,41 @@ void OLED_ShowChar(u8 x, u8 y, u8 size, u8 chr)  // x-y: 128-64    //48, 0
 		   OLED_WR_Byte(ASCII6x8[c*ASCII12x8+i],OLED_DATA);	               //一列显示完
 	}
 }
+
+void OLED_ShowWord(u8 x, u8 y, u8 size, u32 index)  // x-y: 128-64    //48, 0  .    char已经获取到该字在GB_WORD_24x24[]的下标
+{
+	u8 i=0, j=0;	
+
+	if(x > X_WIDTH - 1)				{  x=0;  y=y+2;  }
+
+	/* step:
+	 *  1. 设置x,y坐标
+	 *  2. 写一个字节数据(使用OLED_WR_Byte) , 如此循环24次就可以写完一行
+	 *  3. 重新设置x,y坐标
+	 *  4. 继续写一个字节数据, 如此循环24次写完第二行
+	 *  5. 重新设置x,y坐标
+	 *  6. 继续写一个字节数据, 如此循环24次写完第二行
+	 */
+
+	switch(size) {
+	  case WIDTH_24x24:
+						for(j=0; j< (WIDTH_24x24 / 8); j++) {   // 纵向24个点，每8个点是一个字节
+							OLED_Set_Pos(x,y);
+							for(i=0; i < WIDTH_24x24; i++) {
+								OLED_WR_Byte(GB_WORD_24x24[index + i], OLED_DATA);
+							}
+
+							if(i == WIDTH_24x24 - 1)  {  y+=1;  }
+						}
+						break;
+	  default:
+						break;
+	}
+
+
+
+}
+
 
 //m^n函数
 u32 oled_pow(u8 m,u8 n)
@@ -200,11 +250,123 @@ void OLED_ShowString(u8 x,u8 y,u8 size,char *chr)
 		else if(size==ASCII24x24)  {  x+=ASCII24x24/3;  }         //单个ascii偏移量
 		else if(size==ASCII32x32)  {  x+=ASCII32x32/4;  }         //单个ascii偏移量
 
- 		if(x>X_WIDTH-size){x=0;y+=size/8;}
+ 		if(x > X_WIDTH - size) {
+			x=0;
+			y+=size/8;
+		}
+
  		j++;
 	}
 }
-                                                                                 
+
+#ifdef FUNC_OLED_QXY
+
+u8 OLED_show_ellipsis(u8 x, u8 y, u8 size)
+{
+	u8 i,j,x1,y1;
+	u8 ret=0;
+
+	switch(size) {
+	  case WIDTH_24x24:
+						if((x+ELL_5x8 > X_WIDTH) || (y+8 > Y_WIDTH)) {	// 一个点都不能打,立马返回1
+							return 1;
+						}
+
+						for(i=0; i<3; i++) {							// 预定打印3个'.'，不能打够3个则退出,但肯定有打印,返回0
+							x1 = x+ELL_5x8*i;
+							y1 = y;
+
+							if((x1+ELL_5x8 > X_WIDTH) || (y1+8 > Y_WIDTH)) {	  // 允许不打印完3个点,但当前点放不下，就跳出
+								return 0;
+							}
+
+							OLED_Set_Pos(x1, y1);
+
+							for(j=0; j<ELL_5x8; j++) {
+								OLED_WR_Byte(ellipsis_5x8[j],OLED_DATA);
+							}
+						}
+						return 0;
+	  default:
+	  					ret = 1;
+				break;
+	}
+
+	return ret;
+}
+
+
+/*
+  *null,0和'\0'在ascii中用数字读取时值是0，用字符串读取时就是'\0'(结束符)或者null(与编译器有关)
+  * 而字符'\0'在ascii中,用数字读取时值是48
+  * Ps：在数组和字符串中，0和'\0'是等价的,都能表示结束符。
+  */
+void OLED_show_case_word(struct dots_prop *dots_info)
+{
+	u8 i,j,k,x1,y1;
+
+	if(dots_info == NULL)
+		return;
+
+	switch(dots_info->size) {
+	  case WIDTH_12x16:
+						for(i=0; i<stringLen(dots_info->index); i++) {
+							x1 = dots_info->x + WIDTH_12x16 * i + dots_info->xgap * i;
+							y1 = dots_info->y;
+
+							//注意: 纵向高度还是16
+							for(j=0; j<WIDTH_16x16/8; j++) {		// 每个24x24字体的字循环打点3次(换一行重来共3次)
+								OLED_Set_Pos(x1,y1+j);				// 每重来一次,y+1
+
+								for(k=0; k<WIDTH_12x16; k++) {		// 每个24x24字体的字横向打点24 个字节
+																	// POS会自加1 
+									OLED_WR_Byte(GB_WORD_12x16[(dots_info->index[i]* WIDTH_12x16 * 2) + (j * WIDTH_12x16) + k], OLED_DATA);
+								}
+							}
+						}
+
+						break;
+
+	  case WIDTH_16x16:
+						for(i=0; i<stringLen(dots_info->index); i++) {
+							x1 = dots_info->x + WIDTH_16x16 * i + dots_info->xgap * i;
+							y1 = dots_info->y;
+
+							for(j=0; j<WIDTH_16x16/8; j++) {	  	// 每个24x24字体的字循环打点3次(换一行重来共3次)
+								OLED_Set_Pos(x1,y1+j);		  	// 每重来一次,y+1
+
+								for(k=0; k<WIDTH_16x16; k++) {   // 每个24x24字体的字横向打点24 个字节
+																// POS会自加1 
+									OLED_WR_Byte(GB_WORD_16x16[(dots_info->index[i]* WIDTH_16x16 * 2) + (j * WIDTH_16x16) + k], OLED_DATA);
+								}
+							}
+						}
+
+						break;
+
+	  case WIDTH_24x24:
+	  					//for(i=0; dbg_arr[i] != '\0'; i++) {  //由于第一个index就是0，而'\0'也是0，所以一开始调试时是什么都没有
+						for(i=0; i<stringLen(dots_info->index); i++) {
+							x1 = dots_info->x + WIDTH_24x24 * i + dots_info->xgap * i;
+							y1 = dots_info->y;
+
+							for(j=0; j<WIDTH_24x24/8; j++) {	// 每个24x24字体的字循环打点3次(换一行重来共3次)
+								OLED_Set_Pos(x1,y1+j);			// 每重来一次,y+1
+
+								for(k=0; k<WIDTH_24x24; k++) {	// 每个24x24字体的字横向打点24 个字节
+																// POS会自加1 
+									OLED_WR_Byte(GB_WORD_24x24[(dots_info->index[i]* WIDTH_24x24 * 3) + (j * WIDTH_24x24) + k], OLED_DATA);
+								}
+							}
+						}
+						break;
+	  default:			break;
+	}
+
+}
+
+#endif
+
 void OLED_ClearBMP(u8 x0, u8 y0,u8 x1,u8 y1)
 {
 	
@@ -228,21 +390,20 @@ void OLED_ClearBMP(u8 x0, u8 y0,u8 x1,u8 y1)
 //BMP[]:图片首地址
 void OLED_DrawBMP(u8 x0, u8 y0,u8 x1, u8 y1,const u8 BMP[])
 { 	
-	 u16 j=0;
-	 u8 x,y;
-  
-  //if(y1%8==0) y1=y1/8;      
-  //else y1=y1/8+1;
-	
-	for(y=y0;y<y1;y++)
-	{
+	u16 j=0;
+	u8 x,y;
+
+	//if(y1%8==0) y1=y1/8;      
+	//else y1=y1/8+1;
+
+	for(y=y0;y<y1;y++) {
 		OLED_Set_Pos(x0,y);
-    for(x=x0;x<x0+x1;x++)
-		{      
+		for(x=x0;x<x0+x1;x++) {      
 			OLED_WR_Byte(BMP[j++],OLED_DATA);	    	
 		}
 	}
-} 
+}
+
 void OLED_ClearLine(u8 x)
 {	u8 y;
 	if(x==128)
@@ -303,10 +464,7 @@ void OLED_DrawPoint_Inverse(u8 x ,u8 yy) //x:0~127,y:0~63
 	
 	//u8 y2=0x01;
 	
-	//行选择
-	
-	
-
+	//行选择	
 	   
 	y2=y/8;
 	OLED_WR_Byte(0xb0+y2,OLED_CMD);
@@ -391,8 +549,8 @@ void LCD_Char_CH(u8 x,u8 y,vu8 *str)
 // * 函数名：LCD_Str_CH diao
 // * 描述  ：在指定坐标处显示16*16大小汉字字符串
 // * 输入  : 	- x: 显示位置横向坐标	 
-// *         	- y: 显示位置纵向坐标 
-// *			- str: 显示的中文字符串
+// *         	       - y: 显示位置纵向坐标 
+// *			     - str: 显示的中文字符串
 // * 举例  ：	
 void LCD_Str_CHinese(u8 x,u8 y,vu8 *str)  
 {   
@@ -484,4 +642,45 @@ void OLED_Init(void)
 }  
 
 
+#ifdef FUNC_OLED_QXY
+
+void OLED_Show_logo_str(u8 version) 
+{
+	struct dots_prop dots_info;
+
+	switch(version) {
+	  case LOGO_V1:
+				dots_info.index[0] = 1;
+				dots_info.index[1] = 2;
+				dots_info.index[2] = 3;
+				dots_info.index[3] = '\0';
+
+				dots_info.x        = 20;
+				dots_info.y        =  1;
+				dots_info.xgap     =  6;
+				dots_info.size     = WIDTH_24x24;
+
+				OLED_show_case_word(&dots_info);
+
+
+				dots_info.index[0] = 1;
+				dots_info.index[1] = 2;
+				dots_info.index[2] = 3;
+				dots_info.index[3] = 4;
+				dots_info.index[4] = 5;
+				dots_info.index[5] = '\0';
+
+				dots_info.x        = 20;
+				dots_info.y        =  5;
+				dots_info.xgap     =  6;
+				dots_info.size     = WIDTH_12x16;
+
+				OLED_show_case_word(&dots_info);
+
+	  case LOGO_V2:
+	  default:  break;
+	}
+
+}
+#endif
 

@@ -400,32 +400,28 @@ uint8_t Max30100_ReadReg(uint8_t RegName,uint8_t * pRegValue)
   
   //I2C_WaitEepromStandbyState(MAX30100_ADDR);
 	Max30100_Timeout = MAX30100_LONG_TIMEOUT;
-  while (I2C_GetFlagStatus(I2C2,I2C_FLAG_BUSY)) 
-  {
-    if((Max30100_Timeout--) == 0) goto _exit;
-  }
+    while (I2C_GetFlagStatus(I2C2,I2C_FLAG_BUSY)) {
+        if((Max30100_Timeout--) == 0) goto _exit;
+    }
 	Max30100_Timeout = MAX30100_LONG_TIMEOUT;
 	I2C_GenerateSTART(I2C2, ENABLE);
 	
-	while(!I2C_CheckEvent(I2C2,I2C_EVENT_MASTER_MODE_SELECT))
-	{
-    if((Max30100_Timeout--) == 0) goto _exit;
-  }
+	while(!I2C_CheckEvent(I2C2,I2C_EVENT_MASTER_MODE_SELECT)) {
+        if((Max30100_Timeout--) == 0) goto _exit;
+    }
 	Max30100_Timeout = MAX30100_LONG_TIMEOUT;	
 	I2C_AcknowledgeConfig(I2C2, DISABLE); //
 	I2C_Send7bitAddress  ( I2C2,MAX30100_ADDR, I2C_Direction_Transmitter);
 	
-	while(!I2C_CheckEvent(I2C2,I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
-	{
-    if((Max30100_Timeout--) == 0) goto _exit;
-  }
+	while(!I2C_CheckEvent(I2C2,I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)) {
+        if((Max30100_Timeout--) == 0) goto _exit;
+    }
 	Max30100_Timeout = MAX30100_LONG_TIMEOUT;	
 	I2C_SendData  ( I2C2, RegName);
 	
-	while(!I2C_CheckEvent(I2C2,I2C_EVENT_MASTER_BYTE_TRANSMITTING))
-	{
-    if((Max30100_Timeout--) == 0) goto _exit;
-  }
+	while(!I2C_CheckEvent(I2C2,I2C_EVENT_MASTER_BYTE_TRANSMITTING)) {
+        if((Max30100_Timeout--) == 0) goto _exit;
+    }
 	Max30100_Timeout = MAX30100_LONG_TIMEOUT;	
 	I2C_GenerateSTART(I2C2, ENABLE);      //restart
 	

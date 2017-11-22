@@ -286,6 +286,7 @@ void i2c_Start(void)
 	I2C_SDA_1();
 	I2C_SCL_1();
 	i2c_Delay();
+
 	I2C_SDA_0();
 	i2c_Delay();
 	
@@ -307,6 +308,7 @@ void i2c_Stop(void)
 	I2C_SDA_0();
 	I2C_SCL_1();
 	i2c_Delay();
+
 	I2C_SDA_1();
 	i2c_Delay();
 }

@@ -42,4 +42,5 @@ void ReadID (void);
 *ÐÞ¸Ä:
 *************************************************************/
 int ReadTemperature(void);
+
 #endif

@@ -2,14 +2,27 @@
 #define __OLED_H			  	 
 #include "stm32_ioport.h"
 
+#define FUNC_OLED_QXY
+
 //0:4线串行模式
 #define ASCII12x8  	  6     //一个英文ascii码点整个数*8
 #define ASCII16x16   16
 #define ASCII24x24 	 36
 #define ASCII32x32 	 64
 
+#ifdef FUNC_OLED_QXY
+#define ELL_5x8       5
+#define WIDTH_12x16   12
+#define WIDTH_16x16   16
+#define WIDTH_24x24   24
+
+#define INDMAX         8
+
+#endif
+
 #define X_WIDTH 	128
 #define Y_WIDTH 	 64	
+
 
 //-----------------OLED端口定义----------------  					   
 #define OLED_CS_Clr()   GPIO_ResetBits(GPIOB,GPIO_Pin_0)//CS
@@ -47,4 +60,31 @@ void OLED_ClearBMP(u8 x0, u8 y0,u8 x1,u8 y1);
 void LCD_Str_CHinese(u8 x,u8 y,vu8 *str);
 void OLED_DrawPoint_Inverse(u8 x ,u8 yy);
 void OLED_ClearLine(u8 x);
-#endif 
+
+#ifdef FUNC_OLED_QXY
+struct dots_prop {
+	u8 x;
+	u8 y;
+	u8 size;
+
+	u8 index[INDMAX];	// word array index
+	u8 xgap;			// gap size between two word in x-axis
+};
+
+enum logo_version {
+	LOGO_V1 = 1,
+	LOGO_V2 = 2,
+};
+
+
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
+
+
+extern void print_picture(void);
+extern void print_logo(u8 logoVersion);
+extern void OLED_Show_logo_str(u8 version);
+#endif // FUNC_OLED_QXY end
+
+#endif

@@ -275,19 +275,14 @@ void GPIO_StructInit(GPIO_InitTypeDef* GPIO_InitStruct)
 uint8_t GPIO_ReadInputDataBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
   uint8_t bitstatus = 0x00;
-  
-  /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+ 
+  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));  /* Check the parameters */
   assert_param(IS_GET_GPIO_PIN(GPIO_Pin)); 
-  
-  if ((GPIOx->IDR & GPIO_Pin) != (uint32_t)Bit_RESET)
-  {
-    bitstatus = (uint8_t)Bit_SET;
-  }
-  else
-  {
-    bitstatus = (uint8_t)Bit_RESET;
-  }
+
+  /* 输入数据寄存器(GPIOx_IDR)在每个APB2时钟周期捕捉I/O引脚上的数据*/
+  if ((GPIOx->IDR & GPIO_Pin) != (uint32_t)Bit_RESET)  {    bitstatus = (uint8_t)Bit_SET;  }
+  else                                                 {    bitstatus = (uint8_t)Bit_RESET;  }
+
   return bitstatus;
 }
 
@@ -366,8 +361,7 @@ void GPIO_SetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
   */
 void GPIO_ResetBits(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
-  /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));  /* Check the parameters */
   assert_param(IS_GPIO_PIN(GPIO_Pin));
   
   GPIOx->BRR = GPIO_Pin;
@@ -409,8 +403,7 @@ void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal)
   */
 void GPIO_Write(GPIO_TypeDef* GPIOx, uint16_t PortVal)
 {
-  /* Check the parameters */
-  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));
+  assert_param(IS_GPIO_ALL_PERIPH(GPIOx));  /* Check the parameters */
   
   GPIOx->ODR = PortVal;
 }

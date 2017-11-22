@@ -159,13 +159,11 @@ uint8_t ReadMax30100Status(uint16_t * status)
 	temp =  Max30102_SoftI2C_Read (REG_INT_STATUS1_ADDR);
 	*status += (temp<<8);
 #else	
-	if( Max30100_ReadReg (REG_INT_STATUS0_ADDR,&temp) <= 0)
-	{
+	if( Max30100_ReadReg (REG_INT_STATUS0_ADDR,&temp) <= 0)	{
 		return I2C_Com_Error;
 	}
 	*status = temp;
-	if( Max30100_ReadReg (REG_INT_STATUS1_ADDR,&temp) <= 0)
-	{
+	if( Max30100_ReadReg (REG_INT_STATUS1_ADDR,&temp) <= 0)	{
 		return I2C_Com_Error;
 	}
 	*status += (temp<<8);

@@ -40,11 +40,12 @@ void TimerInit(void);
 
 void InitKeyPad(void);
 void BeepControl(Status_Ctl status);
+void BeepPeriodOn(int enable, int Period);
 void InitBeep(void);
 
 
 int main(void)
-{	
+{
 	RCC_Configuration();                                    // ÏµÍ³Ê±ÖÓÅäÖÃº¯Êı 
 	NVIC_Configuration();                                   // Ç¶Ì×ÏòÁ¿ÖĞ¶Ï¿ØÖÆÆ÷
 
@@ -54,6 +55,17 @@ int main(void)
 
 	OLED_Init();			                                //³õÊ¼»¯OLED : SSD1306 (128 x 64 µãÕó)
 	OLED_Clear();
+
+#if 1
+	InitBeep();	                                        /*·äÃùÆ÷ÉèÖÃ*/
+	BeepPeriodOn(ON, 200);                                  /*  ·äÃùÆ÷Ïì500ms */
+
+#ifdef FUNC_OLED_QXY
+	print_logo(LOGO_V1);
+#endif
+	delay_ms(1000);
+	OLED_Clear();
+#endif
 
 	SetBoardTestMode(FUNCTION_SPO2);	                    /*Ä¬ÈÏÎªÑªÑõÄ£Ê½*/
 
@@ -71,15 +83,9 @@ int main(void)
 
 	InitKeyPad();	                                        /*°´¼üÉèÖÃ*/
 
-	InitBeep();	                                            /*·äÃùÆ÷ÉèÖÃ*/
-
 	TimerInit();                                            /*¶¨Ê±Æ÷ÅäÖÃ*/
 
 	ADC1_Init();                                            /*ECG¡¢PPG¡¢GSR³õÊ¼»¯*/
-
-	BeepControl(ON);                                        /*  <B7><E4><C3><F9><C6><F7><CF><EC>¿<C9><F9>*/
-	delay_ms(500);
-	BeepControl(OFF);
 
 	while(1)
 	{		
@@ -129,6 +135,13 @@ void BeepControl(Status_Ctl status)
 	else               {  GPIO_ResetBits(GPIOB , BEEP);  }
 }
 
+void BeepPeriodOn(int enable, int Period)
+{
+	BeepControl((Status_Ctl)enable);
+	delay_ms(Period);
+	BeepControl(!enable);
+}
+
 void InitKeyPad()
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -152,7 +165,7 @@ void InitKeyPad()
 void TIM2_IRQHandler(void)
 {
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {	//¼ì²âÖÆ¶¨µÄÖĞ¶ÏÊÇ·ñ·¢Éú
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);		//Çå³ıÖĞ¶Ï´¦ÀíÎ»¡£	
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);		//Çå³ıÖĞ¶Ï´¦ÀíÎ»	
 		ShowTemperature();
 		KeyPadProcess();
 	}
@@ -165,7 +178,7 @@ void TimerInit(void)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);          //ÅäÖÃRCC£¬Ê¹ÄÜTIM2
 
 	/* Time Base configuration */
-	TIM_TimeBaseStructure.TIM_Prescaler     = 7199;               //Ê±ÖÓÔ¤·ÖÆµÊı ÀıÈç:Ê±ÖÓÆµÂÊ=72/(Ê±ÖÓÔ¤·ÖÆµ+1)  
+	TIM_TimeBaseStructure.TIM_Prescaler     = 7199;               //Ê±ÖÓÔ¤·ÖÆµÊı ÀıÈç:Ê±ÖÓÆµÂÊ=72/(Ê±ÖÓÔ¤·ÖÆµ+1)  = 72 / 7200 = 1/100
 	TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up; //¶¨Ê±Æ÷Ä£Ê½ ÏòÉÏ¼ÆÊı  
 	TIM_TimeBaseStructure.TIM_Period        = 99;                 //×Ô¶¯ÖØ×°ÔØ¼Ä´æÆ÷ÖÜÆÚµÄÖµ(¶¨Ê±Ê±¼ä)
                                                                   //ÀÛ¼Æ 0xFFFF¸öÆµÂÊºó²úÉú¸ö¸üĞÂ»òÕßÖĞ¶Ï(Ò²ÊÇËµ¶¨Ê±Ê±¼äµ½) 3s
