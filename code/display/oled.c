@@ -301,7 +301,7 @@ u8 OLED_show_ellipsis(u8 x, u8 y, u8 size)
   * 而字符'\0'在ascii中,用数字读取时值是48
   * Ps：在数组和字符串中，0和'\0'是等价的,都能表示结束符。
   */
-void OLED_show_case_word(struct dots_prop *dots_info)
+void OLED_show_case_word(struct characters_prop *dots_info)
 {
 	u8 i,j,k,x1,y1;
 
@@ -646,7 +646,7 @@ void OLED_Init(void)
 
 void OLED_Show_logo_str(u8 version) 
 {
-	struct dots_prop dots_info;
+	struct characters_prop dots_info;
 
 	switch(version) {
 	  case LOGO_V1:

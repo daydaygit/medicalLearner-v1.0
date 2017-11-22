@@ -62,7 +62,7 @@ void OLED_DrawPoint_Inverse(u8 x ,u8 yy);
 void OLED_ClearLine(u8 x);
 
 #ifdef FUNC_OLED_QXY
-struct dots_prop {
+struct characters_prop {
 	u8 x;
 	u8 y;
 	u8 size;
