@@ -8,8 +8,6 @@ typedef enum {
 
 
 /*
-
-
         \   |    /
          \8 |1/
           \ | /
@@ -17,7 +15,7 @@ typedef enum {
  ------+-------
       6   /|\  3
          / |  \
-       /5 |4  \ 
+       /5 |4  \
 
 */
 
@@ -53,8 +51,8 @@ typedef enum {
 #define CLK_HHAND_WID                3
 #define CLK_MHAND_LEN                22
 #define CLK_MHAND_WID                2
-#define CLK_MHAND_LEN                15
-#define CLK_MHAND_WID                1
+#define CLK_SHAND_LEN                15
+#define CLK_SHAND_WID                1
 
 
 //const char clk_plate_eighth_buf[CLK_PLATE_8thARC_SIZE +  CLK_POINTER_EXTRA] = {0};
@@ -76,7 +74,7 @@ struct clk_plate_prop {
 
 	struct timer_digital *timer;
 
-	struct dot_pos *dots_pos;
+	struct dot_pos **dots_pos;
 	u8 arc_size;
 
 	struct clk_hands_prop  *hourhand;
@@ -184,11 +182,12 @@ struct clk_panle_prop {
 
 };
 
-#define TRUE                      1
-#define FALSE                     0
+//#define TRUE                      1
+//#define FALSE                     0
 
-#define EFAULT                     1
+#define EFAULT                    1
 #define EINVAL                    2
+
 
 #define MAP_AREA_1(x, y)    ( x, y)	// 第一象限上半部分
 #define MAP_AREA_2(x, y)    ( y, x)	// 第一象限下半部分

@@ -1,0 +1,137 @@
+报错及修改：
+0.display\graphics.c(738): error:  #20: identifier "clkElement" is undefined
+   char update_bresenham_line(clkElement type, void *param)
+
+enum clkElement {
+	CLK_RESERVED   = 0,
+	CLK_CENTER,
+};
+
+形参要带enum: (enum clkElement type, xx)
+
+1.expression must have pointer type
+   u8 x;
+   x = clkPlate->dots_pos[n]->x;
+   要讲dots_pos单指针改成双指针：
+	struct dot_pos **dots_pos;
+	
+	指针和指针数组
+
+
+	
+2.display\graphics.c(502): error:  #513: a value of type "u8 (*)[64]" cannot be assigned to an entity of type "u8 **"
+   clkPanle->active    = TRUE;
+   
+   bool active;
+   
+   #define TRUE                      1
+   #define FALSE                     0
+
+   typedef enum {
+     FALSE = 0,
+     TRUE  = !FALSE,
+   } bool;
+
+   发现重复定义。取消下面的定义
+   //#define TRUE                      1
+   //#define FALSE                     0
+
+3.？？？？？？？？？？？？？？？？？
+display\graphics.c(484): error:  #513: a value of type "u8 (*)[64]" cannot be assigned to an entity of type "u8 **"
+
+	clkPanle->dots_buf  = panel_dotsPos;
+	
+	u8 **dots_buf;
+	
+	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
+	
+	两个都是2级指针，有问题吗？
+	2级指针和1级指针。当更改指针后，对应的地方也要修改
+
+4.display\graphics.c(841): error:  #29: expected an expression
+	if(minuhand == NULL)) // 多了右括号
+
+5.
+display\graphics.c(814): error:  #513: a value of type "u8" cannot be assigned to an entity of type "u8 *"
+    hourhand->Htimer   = hourhand->plate->timer->hour;
+	
+	u8 *Htimer;
+		u8 hour;
+		
+	hourhand->Htimer   = &hourhand->plate->timer->hour;
+	
+6.display\graphics.c(780): error:  #513: a value of type "struct clk_hands_prop *" cannot be assigned to an entity of type "struct clk_scale_prop *"
+  sprop = (struct clk_hands_prop *)param;   //两边结构体类型不一致
+
+7.display\graphics.c(682): error:  #118: a void function may not return a value
+   函数类型和函数体内返回的类型不一致
+   
+8.define定的宏是什么类型？
+  display\graphics.c(659): warning:  #68-D: integer conversion resulted in a change of sign
+  函数类型char,而return -EFAULT; 而#define EFAULT  1
+  
+9.display\graphics.c(888): error:  #44: expression must have pointer type
+  panle->width 不应用->, 而应该用.
+
+10.display\graphics.c(804): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "u8 *"
+ tmp = (char *)hour_dotspos;
+ u8 tmp = NULL;
+ 改成tmp = (u8 *)hour_dotspos;
+
+11.display\graphics.c(673): warning:  #68-D: integer conversion resulted in a change of sign
+  else            {   incx = -1;  dx=-dx;   }	  
+  
+  u8 incx
+  改成char incx,incy;
+
+12.?????????????????????????????
+display\graphics.c(673): warning:  #68-D: integer conversion resulted in a change of sign
+        else            {   incx = -1;  dx=-dx;   }             //求X增量的绝对值
+		
+		incx、dx都已经是char类型了，怎么还是报warning?
+
+13.display\graphics.c(537): error:  #513: a value of type "u8" cannot be assigned to an entity of type "u8 *"
+        platecenter->plaCenter->cx = platecenter->plate->x0;
+		
+		改成platecenter->plaCenter->cx = &platecenter->plate->x0;
+
+14.display\graphics.h(18): warning:  #2969-D: "\" followed by white space is not a line splice
+         /5 |4  \ 
+   在\后面有个空格，编译器认为是连接符，但实际却是*/
+
+15.display\graphics.c(517): error:  #513: a value of type "u8" cannot be assigned to an entity of type "struct dot_pos"
+        placenter->plate->dots_pos[x0][y0]   = placenter->cent_buf[0];
+display\graphics.c(518): error:  #513: a value of type "u8" cannot be assigned to an entity of type "struct dot_pos"
+        placenter->plate->dots_pos[x0][y0+1] = placenter->cent_buf[1];
+display\graphics.c(519): error:  #513: a value of type "u8" cannot be assigned to an entity of type "struct dot_pos"
+        placenter->plate->dots_pos[x0][y0-1] = placenter->cent_buf[2];
+display\graphics.c(520): error:  #513: a value of type "u8" cannot be assigned to an entity of type "struct dot_pos"
+        placenter->plate->dots_pos[x0+1][y0] = placenter->cent_buf[3];
+display\graphics.c(521): error:  #513: a value of type "u8" cannot be assigned to an entity of type "struct dot_pos"
+        placenter->plate->dots_pos[x0-1][y0] = placenter->cent_buf[4];
+		
+		struct dot_pos **dots_pos;
+		
+		struct dot_pos {
+			u8 x;
+			u8 y;
+		};
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

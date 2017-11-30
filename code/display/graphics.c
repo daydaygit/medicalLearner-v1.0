@@ -302,25 +302,13 @@ static const struct angle_xy_table angle_xy_r20_tab[] = {
      { 90,  0,	 20 },
 };
 
-u8 draw_dots_arc_x8(u8 x0, u8 y0, u8 x, u8 y, u8 r)
+int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panle_prop *clkPanle)
 {
-	char x1, y1;
-	u8 ret=0;	
-}
-
-u8 get_slope_from_table_x1000(u16 d)
-{
-	
-
-}
-
-char arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panle_prop *clkPanle)
-{
-	u8 X,Y,x,y,i,tmp;		// X & Y is belong to panle axes, x0 & y0 are belong too
+	u8 X,Y,x,y;		// X & Y is belong to panle axes, x0 & y0 are belong too
 	char ret = 0;
 
 	if((clkPlate == NULL) || (n > clkPlate->r))
-		return -EINVAL;
+		return (char)-EINVAL;
 
 	/*
 	 * 给出一个点，要map到panle上去
@@ -343,7 +331,7 @@ char arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_pan
 
 	/* the 8th arc is in the top half of the 1st quadrant */
 	/* 第1象限上半部分 */
-	x = clkPlate->dots_pos[n]->x;
+	x = clkPlate->dots_pos[n]->x;   /* 指针和指针数组*/
 	y = clkPlate->dots_pos[n]->y;
 
 	X = clkPlate->x0 + x;  // contain x=0, x0 contain margin
@@ -444,11 +432,10 @@ char arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_pan
 
 }
 
-char arc_data_to_panle(struct clk_plate_prop *clkPlate, struct clk_panle_prop *clkPanle)
+int arc_data_to_panle(struct clk_plate_prop *clkPlate, struct clk_panle_prop *clkPanle)
 {
-	char x,y;
 	u8 i;
-	char ret=0;
+	int ret=0;
 
 	if((clkPlate == NULL) || (clkPanle == NULL) || (clkPlate->active != TRUE))
 		return -EINVAL;
@@ -460,27 +447,9 @@ char arc_data_to_panle(struct clk_plate_prop *clkPlate, struct clk_panle_prop *c
 	return ret;
 }
 
-
-u8 beeline_show(u8 x0, u8 y0, u16 angle)
+int timer_digit_data_init(struct timer_digital *digTime)
 {
-	u8 x,y,d,k;	/* slope = 0~1 */
-
-	x = 0;
-	y = 0;
-	k = get_slope_from_table_x1000(angle);
-	d = 1 - 2*k;
-
-	
-
-	show_dots_beeline(x0, y0, x, y, r);
-
-
-
-}
-
-char timer_digit_data_init(struct timer_digital *digTime)
-{
-	char ret =0;
+	int ret =0;
 
 	if(digTime == NULL)
 		return -EFAULT;
@@ -499,7 +468,7 @@ char timer_digit_data_init(struct timer_digital *digTime)
 }
 
 
-char panel_data_init(struct clk_panle_prop *clkPanle)
+int panel_data_init(struct clk_panle_prop *clkPanle)
 {
 	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
 	u8 cent_x, cent_y;
@@ -534,38 +503,40 @@ char panel_data_init(struct clk_panle_prop *clkPanle)
 	return ret;
 }
 
-char plate_cent_data_to_panle(struct plate_cent_prop *placenter)
+int plate_cent_data_to_panle(struct plate_cent_prop *placenter)
 {
 	u8 x0,y0;
-	char ret = 0;
+	int ret = 0;
 
-	if((placenter == NULL) || (placenter->plate == NULL) || (platecenter->active != TRUE))
+	if((placenter == NULL) || (placenter->plate == NULL) || (placenter->active != TRUE))
 		return -EFAULT;
 
 	x0 = *placenter->plaCenter->cx;
 	y0 = *placenter->plaCenter->cy;
 
-	placenter->plate->dots_buf[x0][y0]   = placenter->cent_buf[0];
-	placenter->plate->dots_buf[x0][y0+1] = placenter->cent_buf[1];
-	placenter->plate->dots_buf[x0][y0-1] = placenter->cent_buf[2];
-	placenter->plate->dots_buf[x0+1][y0] = placenter->cent_buf[3];
-	placenter->plate->dots_buf[x0-1][y0] = placenter->cent_buf[4];
+#if 0
+	placenter->plate->dots_pos[x0][y0]   = placenter->cent_buf[0];
+	placenter->plate->dots_pos[x0][y0+1] = placenter->cent_buf[1];
+	placenter->plate->dots_pos[x0][y0-1] = placenter->cent_buf[2];
+	placenter->plate->dots_pos[x0+1][y0] = placenter->cent_buf[3];
+	placenter->plate->dots_pos[x0-1][y0] = placenter->cent_buf[4];
+#endif
 
 	return ret;
 }
 
-char plateCent_data_init(struct plate_cent_prop *platecenter)
+int plateCent_data_init(struct plate_cent_prop *platecenter)
 {
 	u8 circ_cent_buf[CIRCLE_CENT_BSZ] = {1,1,1,1,1};
-	char ret = 0;
+	int ret = 0;
 
-	if(platecenter == NULL))
+	if(platecenter == NULL)
 		return -EFAULT;
 
 	platecenter->plate = &plate;
 
-	platecenter->plaCenter->cx = platecenter->plate->x0;
-	platecenter->plaCenter->cy = platecenter->plate->y0;
+	platecenter->plaCenter->cx = &platecenter->plate->x0;
+	platecenter->plaCenter->cy = &platecenter->plate->y0;
 
 	platecenter->cent_buf = circ_cent_buf;
 
@@ -576,18 +547,18 @@ char plateCent_data_init(struct plate_cent_prop *platecenter)
 	return ret;
 }
 
-char bresenham_circle_plate(struct clk_plate_prop *clkPlate)
+int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 {
 	u8 x,y,i = 0;
 	int d;
 	char ret = 0;
 
 	x = 0;
-	y = r;
-	d = 3 - 2 * r;
+	y = clkPlate->r;
+	d = 3 - 2 * clkPlate->r;
 
-	clkPlate.dots_pos[0].x = x;
-	clkPlate.dots_pos[0].y = y;
+	clkPlate->dots_pos[0]->x = x;
+	clkPlate->dots_pos[0]->y = y;
 
 	//draw_dots_arc_x8(x0, y0, x, y, r);
 
@@ -603,8 +574,8 @@ char bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 		}
 		x++;
 
-		plate.dots_pos[i].x = x;
-		plate.dots_pos[i].y = y;
+		plate.dots_pos[i]->x = x;
+		plate.dots_pos[i]->y = y;
 
 		//draw_dots_arc_x8(x0, y0, x, y, r);
 	}
@@ -617,7 +588,7 @@ char bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 	return ret;
 }
 
-char plate_data_init(struct clk_plate_prop *clkPlate)
+int plate_data_init(struct clk_plate_prop *clkPlate)
 {
 	struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];
 	u8 i, *tmp = NULL;
@@ -628,7 +599,7 @@ char plate_data_init(struct clk_plate_prop *clkPlate)
 		return -EFAULT;
 
 	/* clean plate buffer */
-	tmp = (char *)plate_dotsPos_buf;		// &plate_dotsPos_buf
+	tmp = (u8 *)plate_dotsPos_buf;		// &plate_dotsPos_buf
 	for(i=0; i<sizeof(plate_dotsPos_buf); i++) {
 		*(tmp + i) = 0;
 	}
@@ -650,7 +621,7 @@ char plate_data_init(struct clk_plate_prop *clkPlate)
 	clkPlate->margin_x   = 0;
 	clkPlate->margin_y   = 0;
 
-	clkPlate->dots_pos   = plate_dotsPos_buf;
+	clkPlate->dots_pos   = &plate_dotsPos_buf;
 
 	clkPlate->active     = TRUE;
 
@@ -663,11 +634,11 @@ char plate_data_init(struct clk_plate_prop *clkPlate)
 	return ret;
 }
 
-char plate_scale_data_init(struct clk_scale_prop *clkscale)
+int plate_scale_data_init(struct clk_scale_prop *clkscale)
 {
-	char ret = 0;
+	int ret = 0;
 
-	if(clkscale == NULL))
+	if(clkscale == NULL)
 		return -EFAULT;
 
 																																																																																																										
@@ -676,14 +647,15 @@ char plate_scale_data_init(struct clk_scale_prop *clkscale)
 }
 
 //功能:在(x0,y0)到(x1,y1)之间画一条直线(Bresenham算法)
-void draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
+int draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
 {
 	u8 i;
 	u8 xerr=0,yerr=0;
-	u8 dx,dy;
+	char dx,dy;
 	u8 distance;
-	u8 incx,incy;
+	char incx,incy;
 	u8 row,col;
+	int ret = 0;
 
 	if(dots_pos == NULL)
 		return -EFAULT;
@@ -700,6 +672,7 @@ void draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
 	if(dx == 0)     {   incx =  0;            }     //垂直线
 	else if(dx > 0) {   incx =  1;            }
 	else            {   incx = -1;  dx=-dx;   }		//求X增量的绝对值
+  //else            {   incx = -1;  dx *= -1;   }		//求X增量的绝对值
 
 	if(dy == 0)     {   incy = 0;             }		//水平线
 	else if(dy > 0) {   incy = 1;             }
@@ -744,6 +717,8 @@ void draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
 		}
 	}
 #endif
+
+	return ret;
 }
 
 
@@ -765,14 +740,14 @@ int transfer_humAngle_to_axesAngle(int humAngle)
 	return angle;
 }
 
-char update_bresenham_line(clkElement type, void *param)
+int update_bresenham_line(enum clkElement type, void *param)
 {
 	struct clk_hands_prop *hourhand = NULL;
 	struct clk_hands_prop *minuhand = NULL;
 	struct clk_hands_prop *sechand  = NULL;
-	struct clk_scale_prop *sprop   = NULL;
+	struct clk_scale_prop *platscal   = NULL;
 	u8 x0,y0,x1,y1,coorAngle;
-	char ret = 0;
+	int ret = 0;
 
 	if(param == NULL)
 		return -EFAULT;
@@ -802,33 +777,33 @@ char update_bresenham_line(clkElement type, void *param)
 	  	break;
 	  case CLK_MINT_HAND:
 	  	minuhand = (struct clk_hands_prop *)param;
+		coorAngle = transfer_humAngle_to_axesAngle(minuhand->angle);
 		break;
 	  case CLK_SECD_HAND:
 	  	sechand  = (struct clk_hands_prop *)param;
+		coorAngle = transfer_humAngle_to_axesAngle(sechand->angle);
 		break;
 	  case CLK_TIME_SCALE:
-	  	sprop = (struct clk_hands_prop *)param;
+		platscal = (struct clk_scale_prop *)param;
+		coorAngle = transfer_humAngle_to_axesAngle(platscal->angle);
 		break;
 	}
 
+  return ret;
 }
 
-char hourhand_data_to_panle()
-{
 
-}
-
-char hour_hand_data_init(struct clk_hands_prop *hourhand)
+int hour_hand_data_init(struct clk_hands_prop *hourhand)
 {
 	u8 i, *tmp = NULL;
 	struct dot_pos hour_dotspos[CLK_HHAND_LEN * CLK_HHAND_WID];
 
 	char ret = 0;
 
-	if(hourhand == NULL))
+	if(hourhand == NULL)
 		return -EFAULT;
 
-	tmp = (char *)hour_dotspos;
+	tmp = (u8 *)hour_dotspos;
 	for(i=0; i<sizeof(hour_dotspos);i++) {
 		*(tmp + i) = 0;
 	}
@@ -841,7 +816,7 @@ char hour_hand_data_init(struct clk_hands_prop *hourhand)
 	hourhand->handLen  = CLK_HHAND_LEN;
 	hourhand->handwide = CLK_HHAND_WID;
 
-	hourhand->Htimer   = hourhand->plate->timer->hour;
+	hourhand->Htimer   = &hourhand->plate->timer->hour;
 	hourhand->angle    = 0;
 
 	hourhand->dots_pos = hour_dotspos;
@@ -859,26 +834,26 @@ char hour_hand_data_init(struct clk_hands_prop *hourhand)
 	  */
 
 	ret = update_bresenham_line(CLK_HOUR_HAND, (void *)hourhand);
-	ret = hourhand_data_to_panle();
+	//ret = hourhand_data_to_panle();
 
 	return ret;
 }
 
-char minute_hand_data_init(struct clk_hands_prop *minuhand)
+int minute_hand_data_init(struct clk_hands_prop *minuhand)
 {
 	char ret = 0;
 
-	if(minuhand == NULL))
+	if(minuhand == NULL)
 		return -EFAULT;
 
 	return ret;
 }
 
-char second_hand_data_init(struct clk_hands_prop *sechand)
+int second_hand_data_init(struct clk_hands_prop *sechand)
 {
 	char ret = 0;
 
-	if(sechand == NULL))
+	if(sechand == NULL)
 		return -EFAULT;
 
 	return ret;
@@ -907,16 +882,19 @@ char clk_panle_init(void)
 	return ret;
 }
 
-char draw_panle_graphics(void)
+int draw_panle_graphics(void)
 {
 	u8 i,j;
-	char ret = 0;
+	int ret = 0;
 
-	for(i=0; i<panle->width; i++) {
-		for(j=0; j<panle->height; j++) {
+	for(i=0; i<panle.width; i++) {
+		for(j=0; j<panle.height; j++) {
+			ret = 0;
 			//draw_dots(panle->dots_buf[i][j]);
 		}
 	}
+
+	return ret;
 }
 
 /*
