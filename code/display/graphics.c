@@ -710,7 +710,7 @@ int draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
 	u8 xerr=0,yerr=0;
 	char dx,dy;
 	u8 distance;
-	char incx,incy;
+	signed char incx,incy;
 	u8 row,col;
 	int ret = 0;
 

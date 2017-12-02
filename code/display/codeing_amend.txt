@@ -123,6 +123,19 @@ display\graphics.c(673): warning:  #68-D: integer conversion resulted in a chang
 		incx、dx都已经是char类型了，怎么还是报warning?
 		-1是int类型的，结果dx就不是char范围内的值了，而且还会导致截取低位数据给char
 
+		问题不是dx=-dx，而是在incx=-1处！
+		------------------------------------------------
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		!                                                                                                                                          !
+		! 为了代码移植，一定不要用 char ！！！ 要使用 int8_t 或 uint8_t                                                                            !
+		! arm-linux-gcc 规定 char 为 unsigned char ！！！                                                                                          !
+		! 用十六进制（0x开头的）表示的常数，都代表无符号数。                                                                                       !
+		! char short 在使用时编译器会 Promotion 为 int or unsigned int 。                                                                          !
+		! 我以前总以为 char 代表有符号，而 unsigned char 代表无符号。现在才知道如果换做 short 或 int,这样理解都没问题，因为c标准明确定义了。       !
+		! 但是，唯独 char 不能这样理解，因为c标准中对此是 Impementation Defined，就是未明确定义，由具体的编译器明确定义。                          !
+		!                                                                                                                                          !
+		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 13.display\graphics.c(537): error:  #513: a value of type "u8" cannot be assigned to an entity of type "u8 *"
         platecenter->plaCenter->cx = platecenter->plate->x0;
 		
