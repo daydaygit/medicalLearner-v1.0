@@ -1,7 +1,7 @@
 报错及修改：
 0.display\graphics.c(738): error:  #20: identifier "clkElement" is undefined
    char update_bresenham_line(clkElement type, void *param)
-
+源码：
 enum clkElement {
 	CLK_RESERVED   = 0,
 	CLK_CENTER,
@@ -11,6 +11,8 @@ enum clkElement {
 
 1.expression must have pointer type
    u8 x;
+源码：
+源码：
    x = clkPlate->dots_pos[n]->x;
    要讲dots_pos单指针改成双指针：
 	struct dot_pos **dots_pos;
@@ -21,7 +23,7 @@ enum clkElement {
 	
 2.display\graphics.c(502): error:  #513: a value of type "u8 (*)[64]" cannot be assigned to an entity of type "u8 **"
    clkPanle->active    = TRUE;
-   
+源码：
    bool active;
    
    #define TRUE                      1
@@ -38,7 +40,7 @@ enum clkElement {
 
 3.？？？？？？？？？？？？？？？？？
 display\graphics.c(484): error:  #513: a value of type "u8 (*)[64]" cannot be assigned to an entity of type "u8 **"
-
+源码：
 	clkPanle->dots_buf  = panel_dotsPos;
 	
 	u8 **dots_buf;
@@ -46,7 +48,36 @@ display\graphics.c(484): error:  #513: a value of type "u8 (*)[64]" cannot be as
 	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
 	
 	两个都是2级指针，有问题吗？
+    -----编译出错，不能用二级指针直接指向二维数组
+	-----二维数组名是一个数组指针，而非二级指针
 	2级指针和1级指针。当更改指针后，对应的地方也要修改
+
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	用指针替代二维数组是一种可怕的想法，非常容易引入错误
+    如果确实需要通过指针访问二维数组，建议采用如下方式：
+
+    int a[m][n];
+    int *p = &a[0][0];
+    通过p[i*n+j]访问a[i][j]
+
+3.1 display\graphics.c(353): error:  #137: expression must be a modifiable lvalue
+        clkPanle->dots_buf + X * clkPanle->width + Y = 1;  /* 是否应该dots_buf指向第0行第0列元素地址更好? */
+	源码：
+	clkPanle->dots_buf	= panel_dotsPos;	/* 第0行首地址*/
+
+	u8 *dots_buf;
+	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
+
+	关于expression must be a modifiable lvalue
+	描述:表达式必须是一个可以修改的左值
+	主要出现在这种现象
+	a=NUM;
+	NUM是一个数值或表达式,a为一个变量
+	但a被定义为像const这种不可更改的类型导致NUM不能赋值给变量
+	解决方法要么放弃赋值要么修改变量属性
+
+	----------------
+	其实也不是上面说的首地址和0列的差异，而是左值是元素地址，不知元素值！改成*(Addr)
 
 4.display\graphics.c(841): error:  #29: expected an expression
 	if(minuhand == NULL)) // 多了右括号
@@ -54,7 +85,7 @@ display\graphics.c(484): error:  #513: a value of type "u8 (*)[64]" cannot be as
 5.
 display\graphics.c(814): error:  #513: a value of type "u8" cannot be assigned to an entity of type "u8 *"
     hourhand->Htimer   = hourhand->plate->timer->hour;
-	
+	源码：
 	u8 *Htimer;
 		u8 hour;
 		
@@ -78,9 +109,10 @@ display\graphics.c(814): error:  #513: a value of type "u8" cannot be assigned t
  u8 tmp = NULL;
  改成tmp = (u8 *)hour_dotspos;
 
-11.display\graphics.c(673): warning:  #68-D: integer conversion resulted in a change of sign
+11.？？？？？？？？
+display\graphics.c(673): warning:  #68-D: integer conversion resulted in a change of sign
   else            {   incx = -1;  dx=-dx;   }	  
-  
+  源码：
   u8 incx
   改成char incx,incy;
 
@@ -89,6 +121,7 @@ display\graphics.c(673): warning:  #68-D: integer conversion resulted in a chang
         else            {   incx = -1;  dx=-dx;   }             //求X增量的绝对值
 		
 		incx、dx都已经是char类型了，怎么还是报warning?
+		-1是int类型的，结果dx就不是char范围内的值了，而且还会导致截取低位数据给char
 
 13.display\graphics.c(537): error:  #513: a value of type "u8" cannot be assigned to an entity of type "u8 *"
         platecenter->plaCenter->cx = platecenter->plate->x0;
@@ -116,7 +149,7 @@ display\graphics.c(521): error:  #513: a value of type "u8" cannot be assigned t
 			u8 x;
 			u8 y;
 		};
-		
+
 		
 		
 
