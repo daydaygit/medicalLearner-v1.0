@@ -2,6 +2,8 @@
 #include "oled.h"
 #include "uart.h"
 
+#include "function_oem.h"
+
 #ifdef FUNC_OLED_QXY
 //最好是使用extern函数，不要include.h文件，这样生成的bin就小一些
 #include "stdio.h"					// sprintf
@@ -28,6 +30,8 @@ const u8 BMP_Buf[] = {0xF8,0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,
                       0xFC,0xFE,0xFE,0xFE,0xFE,0xFE,0xFC,0xF8,
                       0x01,0x03,0x07,0x0F,0x1F,0x3F,0x7F,0xFF,
                       0xFF,0x7F,0x3F,0x1F,0x0F,0x07,0x03,0x01};
+
+const u8 BMP_Test_Buf[] = {0x00};
 
 static uint8_t 	Xvalue=0;
 static uint8_t 	Yvalue=0;
@@ -230,7 +234,10 @@ void SendDataToPc(uint8_t * DataBuf,uint8_t dataLen)
 	
 	USART1_SendDataDMA(DataBuf,112);
 	USART2_SendDataDMA(DataBuf,112);
+#ifndef USB_FUNC_DISABLE
 	USB_SendData(DataBuf,112);
+#endif
+
 #endif
 }
 

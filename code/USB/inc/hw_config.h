@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : hw_config.h
 * Author             : MCD Application Team
@@ -47,3 +50,4 @@ void Get_SerialNum(void);
 #endif  /*__HW_CONFIG_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+#endif

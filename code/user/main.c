@@ -13,6 +13,8 @@
 #include "hw_config.h"
 #include "usb_init.h"
 
+#include "function_oem.h"
+
 #define DS18B20           GPIO_Pin_7    //PA7
 
 #define BEEP              GPIO_Pin_15
@@ -77,9 +79,11 @@ int main(void)
 	ReadMax30100Status(&IntStatus);                         /*清除Max30100中断*/
 	EXTI_ClearITPendingBit(EXTI_Line12);                    //??? 
 
+#ifndef USB_FUNC_DISABLE
 	USB_Interrupts_Config();	                            /* usb初始化*/
 	Set_USBClock();
 	USB_Init();
+#endif
 
 	InitKeyPad();	                                        /*按键设置*/
 

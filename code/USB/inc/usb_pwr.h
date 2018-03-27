@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_pwr.h
 * Author             : MCD Application Team
@@ -58,3 +61,4 @@ extern __IO bool fSuspendEnabled;  /* true when suspend is possible */
 #endif  /*__USB_PWR_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+#endif

@@ -1,3 +1,22 @@
+#include "function_oem.h"
+
+#ifdef USB_FUNC_DISABLE
+
+#include "usb_core.h"
+
+#define EP_NUM     (3)
+
+DEVICE Device_Table =
+{
+    EP_NUM,
+    1
+};
+DEVICE_PROP Device_Property;
+USER_STANDARD_REQUESTS User_Standard_Requests;
+ONE_DESCRIPTOR Device_Descriptor;
+
+#else
+
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_prop.c
 * Author             : MCD Application Team
@@ -423,3 +442,4 @@ uint8_t *CustomHID_GetProtocolValue(uint16_t Length)
 }
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+#endif

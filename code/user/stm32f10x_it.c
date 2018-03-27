@@ -23,7 +23,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-
+#include "function_oem.h"
 
 
 /** @addtogroup STM32F10x_StdPeriph_Template
@@ -131,7 +131,9 @@ void PendSV_Handler(void)
 #ifndef STM32F10X_CL
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
+#ifndef USB_FUNC_DISABLE
   USB_Istr();
+#endif
 }
 #endif /* STM32F10X_CL */
 /**

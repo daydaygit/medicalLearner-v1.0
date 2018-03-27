@@ -1,3 +1,63 @@
+#include "function_oem.h"
+
+#ifdef USB_FUNC_DISABLE
+
+typedef unsigned int uint16_t;
+typedef unsigned char uint8_t;
+typedef uint16_t u16;
+
+#define     __IO    volatile
+
+__IO uint16_t wIstr;  /* ISTR register last read value */
+__IO uint8_t bIntPackSOF = 0;  /* SOFs received between 2 consecutive packets */
+
+/* Extern variables ----------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
+/* function pointers to non-control endpoints service routines */
+
+
+void EP1_IN_Callback(void){}
+void EP2_IN_Callback(void){}
+void EP3_IN_Callback(void){}
+void EP4_IN_Callback(void){}
+void EP5_IN_Callback(void){}
+void EP6_IN_Callback(void){}
+void EP7_IN_Callback(void){}
+
+void EP1_OUT_Callback(void){}
+void EP2_OUT_Callback(void){}
+void EP3_OUT_Callback(void){}
+void EP4_OUT_Callback(void){}
+void EP5_OUT_Callback(void){}
+void EP6_OUT_Callback(void){}
+void EP7_OUT_Callback(void){}
+
+
+void (*pEpInt_IN[7])(void) =
+  {
+    EP1_IN_Callback,
+    EP2_IN_Callback,
+    EP3_IN_Callback,
+    EP4_IN_Callback,
+    EP5_IN_Callback,
+    EP6_IN_Callback,
+    EP7_IN_Callback,
+  };
+
+void (*pEpInt_OUT[7])(void) =
+  {
+    EP1_OUT_Callback,
+    EP2_OUT_Callback,
+    EP3_OUT_Callback,
+    EP4_OUT_Callback,
+    EP5_OUT_Callback,
+    EP6_OUT_Callback,
+    EP7_OUT_Callback,
+  };
+
+#else
+
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_istr.c
 * Author             : MCD Application Team
@@ -380,3 +440,4 @@ u32 STM32_PCD_OTG_ISR_Handler (void)
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
 
+#endif

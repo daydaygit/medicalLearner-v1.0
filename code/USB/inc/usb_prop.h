@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_prop.h
 * Author             : MCD Application Team
@@ -67,3 +70,4 @@ uint8_t *CustomHID_GetHIDDescriptor(uint16_t Length);
 #endif /* __USB_PROP_H */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+#endif

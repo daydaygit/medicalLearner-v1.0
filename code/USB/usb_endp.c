@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2009 STMicroelectronics ********************
 * File Name          : usb_endp.c
 * Author             : MCD Application Team
@@ -74,3 +77,4 @@ void EP2_IN_Callback(void)
 
 /******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
 
+#endif

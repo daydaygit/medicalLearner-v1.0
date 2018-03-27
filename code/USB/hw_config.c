@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : hw_config.c
 * Author             : MCD Application Team
@@ -456,3 +459,4 @@ void USB_OTG_BSP_uDelay (const uint32_t usec)
 }
 #endif
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+#endif

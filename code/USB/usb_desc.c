@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_desc.c
 * Author             : MCD Application Team
@@ -171,3 +174,4 @@ uint8_t CustomHID_StringSerial[CUSTOMHID_SIZ_STRING_SERIAL] =
 };
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
 
+#endif

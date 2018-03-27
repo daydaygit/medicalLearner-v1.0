@@ -1,3 +1,12 @@
+#include "function_oem.h"
+
+#ifdef USB_FUNC_DISABLE
+
+#define EP_NUM     (3)
+
+#define IMR_MSK (CNTR_CTRM  | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM  | CNTR_SOFM | CNTR_ESOFM | CNTR_RESETM )
+
+#else
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_conf.h
 * Author             : MCD Application Team
@@ -189,4 +198,6 @@
 #endif /*__USB_CONF_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+
+#endif
 

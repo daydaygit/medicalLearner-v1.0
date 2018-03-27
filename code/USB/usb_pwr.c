@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
 * File Name          : usb_pwr.c
 * Author             : MCD Application Team
@@ -258,3 +261,4 @@ void Resume(RESUME_STATE eResumeSetVal)
 }
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+#endif

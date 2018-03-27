@@ -1,3 +1,6 @@
+#include "function_oem.h"
+
+#ifndef USB_FUNC_DISABLE
 /**
   ******************************************************************************
   * @file    usbio.c
@@ -69,3 +72,4 @@ uint32_t USB_GetData(uint8_t *data,uint32_t dataNum)
 
 /*********************************END OF FILE**********************************/
 
+#endif
