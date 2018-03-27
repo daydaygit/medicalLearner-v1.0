@@ -74,8 +74,8 @@ struct clk_plate_prop {
 
 	struct timer_digital *timer;
 
-	struct dot_pos **dots_pos;
-	u8 arc_size;
+	struct dot_pos *dots_pos;
+	u8 arc_bufsize;
 
 	struct clk_hands_prop  *hourhand;
 	struct clk_hands_prop  *minuhand;
@@ -174,7 +174,10 @@ struct clk_panle_prop {
 
 	//struct panle_dots_buf *dots_buf;
 	//struct panle_dots_buf **dots_buf;
-	u8 **dots_buf;
+	//u8 **dots_buf;
+	u8 *dots_buf;
+	// dots_bhsize;		/* buf height size */  /* can be placedwith height & width above */
+	// dots_bwsize;		/* buf width  size */
 
 	struct clk_plate_prop *plate;
 

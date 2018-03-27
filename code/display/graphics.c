@@ -331,8 +331,16 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 
 	/* the 8th arc is in the top half of the 1st quadrant */
 	/* 第1象限上半部分 */
-	x = clkPlate->dots_pos[n]->x;   /* 指针和指针数组*/
-	y = clkPlate->dots_pos[n]->y;
+	//x = clkPlate->dots_pos[n]->x;   /* 指针和指针数组*/
+	//y = clkPlate->dots_pos[n]->y;
+
+	//x = clkPlate->dots_pos[n]->x;   /* 指针和指针数组*/
+	//y = clkPlate->dots_pos[n]->y;
+
+	/* clkPlate->dots_pos已经指向1维结构体数组首地址(首个元素地址)*/
+	/* clkPlate->dots_pos + 1指向1维结构体数组第二个元素地址*/
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 + x;  // contain x=0, x0 contain margin
 	Y = clkPlate->y0 - y;
@@ -340,12 +348,24 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1; // 第一象限上半部分
+	//clkPanle->dots_buf[ X][ Y] = 1; // 第一象限上半部分
+
+	/* clkPanle->dots_buf指向第0行首地址 */
+	/* (x) clkPanle->dots_buf + 1指向第1行首地址 */
+	/* (x) *(clkPanle->dots_buf + 1)指向第1行第0列元素地址,非&(clkPanle->dots_buf + 1) */
+	/* (x) *(clkPanle->dots_buf + 1) + 2 指向第1行第2列元素地址 */
+	/* (x) *(*(clkPanle->dots_buf + 1) + 2 )指向第1行第2列元素的值 */
+
+	/* clkPanle->dots_buf指向第0行首地址 */
+	/* clkPanle->dots_buf是u8 *类型的, +1不是指向二维数组下一行*/
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;  /* 是否应该dots_buf指向第0行第0列元素地址更好? */
 
 
 	/* 第1象限下半部分 : (x,y)->(y,x), '+' */
-	x = clkPlate->dots_pos[n]->y;
-	y = clkPlate->dots_pos[n]->x;
+	//x = clkPlate->dots_pos[n]->y;
+	//y = clkPlate->dots_pos[n]->x;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 + x;
 	Y = clkPlate->y0 - y;
@@ -353,12 +373,15 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 
 	/* 第2象限上半部分 */
-	x = -clkPlate->dots_pos[n]->x;
-	y =  clkPlate->dots_pos[n]->y;
+	//x = -clkPlate->dots_pos[n]->x;
+	//y =  clkPlate->dots_pos[n]->y;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 - y;
@@ -366,11 +389,14 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 	/* 第2象限下半部分 */
-	x = -clkPlate->dots_pos[n]->y;
-	y =  clkPlate->dots_pos[n]->x;
+	//x = -clkPlate->dots_pos[n]->y;
+	//y =  clkPlate->dots_pos[n]->x;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 - y;
@@ -378,11 +404,14 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 	/* 第3象限上半部分 */
-	x = -clkPlate->dots_pos[n]->y;
-	y = -clkPlate->dots_pos[n]->x;
+	//x = -clkPlate->dots_pos[n]->y;
+	//y = -clkPlate->dots_pos[n]->x;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 + y;
@@ -390,11 +419,14 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 	/* 第3象限下半部分 */
-	x = -clkPlate->dots_pos[n]->x;
-	y = -clkPlate->dots_pos[n]->y;
+	//x = -clkPlate->dots_pos[n]->x;
+	//y = -clkPlate->dots_pos[n]->y;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 + y;
@@ -402,11 +434,14 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 	/* 第4象限上半部分 */
-	x =  clkPlate->dots_pos[n]->x;
-	y = -clkPlate->dots_pos[n]->y;
+	//x =  clkPlate->dots_pos[n]->x;
+	//y = -clkPlate->dots_pos[n]->y;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 + x;
 	Y = clkPlate->y0 + y;
@@ -414,11 +449,14 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 	/* 第4象限下半部分 */
-	x =  clkPlate->dots_pos[n]->y;
-	y = -clkPlate->dots_pos[n]->x;
+	//x =  clkPlate->dots_pos[n]->y;
+	//y = -clkPlate->dots_pos[n]->x;
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
 
 	X = clkPlate->x0 + x;
 	Y = clkPlate->y0 + y;
@@ -426,7 +464,8 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	if((X > clkPanle->height) || (Y > clkPanle->width)) {
 		return -EFAULT;
 	}
-	clkPanle->dots_buf[ X][ Y] = 1;
+	//clkPanle->dots_buf[ X][ Y] = 1;
+	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
 
 	return ret;
 
@@ -440,7 +479,7 @@ int arc_data_to_panle(struct clk_plate_prop *clkPlate, struct clk_panle_prop *cl
 	if((clkPlate == NULL) || (clkPanle == NULL) || (clkPlate->active != TRUE))
 		return -EINVAL;
 
-	for(i=0; i<clkPlate->arc_size; i++) {
+	for(i=0; i<clkPlate->arc_bufsize; i++) {
 		arc_dot_data_to_panle(clkPlate, i, clkPanle);
 	}
 
@@ -480,7 +519,17 @@ int panel_data_init(struct clk_panle_prop *clkPanle)
 	/* 结构体指针中的实体变量也是虚的?*/
 	/* 那结构体指针中的变量是用指针变量还是普通变量?*/
 
-	clkPanle->dots_buf  = panel_dotsPos;
+	//clkPanle->dots_buf  = panel_dotsPos;
+
+	//clkPanle->dots_buf  = &panel_dotsPos[0][0];
+	//clkPanle->dots_buf  = *(panel_dotsPos+0);
+	//clkPanle->dots_buf  = panel_dotsPos[0];
+	clkPanle->dots_buf  = *panel_dotsPos;		/* 第0行第0列地址*/
+
+	//clkPanle->dots_buf	= panel_dotsPos;			/* 第0行首地址*/  /* 这样设计,编译器对使用地方报错*/
+
+	//kPanle->dots_bhsize = PANLE_HORIZONTAL;
+	//kPanle->dots_bwsize = PANLE_VERTICAL;
 
 	clkPanle->plate     = &plate;
 	//clkPanle->clkScale  = &clkScale;
@@ -557,8 +606,11 @@ int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 	y = clkPlate->r;
 	d = 3 - 2 * clkPlate->r;
 
-	clkPlate->dots_pos[0]->x = x;
-	clkPlate->dots_pos[0]->y = y;
+	//clkPlate->dots_pos[0]->x = x;
+	//clkPlate->dots_pos[0]->y = y;
+
+	clkPlate->dots_pos->x = x;
+	clkPlate->dots_pos->y = y;
 
 	//draw_dots_arc_x8(x0, y0, x, y, r);
 
@@ -574,8 +626,11 @@ int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 		}
 		x++;
 
-		plate.dots_pos[i]->x = x;
-		plate.dots_pos[i]->y = y;
+		//plate.dots_pos[i]->x = x;
+		//plate.dots_pos[i]->y = y;
+
+		(plate.dots_pos + i)->x = x;
+		(plate.dots_pos + i)->y = y;
 
 		//draw_dots_arc_x8(x0, y0, x, y, r);
 	}
@@ -583,14 +638,14 @@ int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 	//plate.dots_pos[i].x = '\0';
 	//plate.dots_pos[i].y = '\0';
 
-	clkPlate->arc_size = i;
+	clkPlate->arc_bufsize = i;
 
 	return ret;
 }
 
 int plate_data_init(struct clk_plate_prop *clkPlate)
 {
-	struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];
+	struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];	/* 结构体数组*/
 	u8 i, *tmp = NULL;
 	u8 size;
 	char ret = 0;
@@ -621,7 +676,9 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 	clkPlate->margin_x   = 0;
 	clkPlate->margin_y   = 0;
 
-	clkPlate->dots_pos   = &plate_dotsPos_buf;
+	//clkPlate->dots_pos   = &plate_dotsPos_buf;	/* 1维结构体数组名还是代表数组首地址*/
+	clkPlate->dots_pos   = plate_dotsPos_buf;
+	clkPlate->arc_bufsize = sizeof(plate_dotsPos_buf);	/* default size */
 
 	clkPlate->active     = TRUE;
 
@@ -653,7 +710,7 @@ int draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
 	u8 xerr=0,yerr=0;
 	char dx,dy;
 	u8 distance;
-	char incx,incy;
+	signed char incx,incy;
 	u8 row,col;
 	int ret = 0;
 
@@ -671,12 +728,11 @@ int draw_bresenham_line(struct dot_pos *dots_pos, u8 x0, u8 y0, u8 x1, u8 y1)
 	//设置单步方向,判断递增方向
 	if(dx == 0)     {   incx =  0;            }     //垂直线
 	else if(dx > 0) {   incx =  1;            }
-	else            {   incx = -1;  dx=-dx;   }		//求X增量的绝对值
-  //else            {   incx = -1;  dx *= -1;   }		//求X增量的绝对值
+	else            {   incx = -1;  dx *= -1; }		//求X增量的绝对值
 
 	if(dy == 0)     {   incy = 0;             }		//水平线
 	else if(dy > 0) {   incy = 1;             }
-	else            {   incy = -1;  dy=-dy;   }     //求Y增量的绝对值
+	else            {   incy = -1;  dy *= -1; }     //求Y增量的绝对值
 
 	distance = (dx > dy) ? dx : dy;	                //选取最大值增量;  dx大则若在x正半轴上斜率小于45度
 
