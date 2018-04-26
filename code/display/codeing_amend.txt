@@ -22,7 +22,7 @@ enum clkElement {
 
 	
 2.display\graphics.c(502): error:  #513: a value of type "u8 (*)[64]" cannot be assigned to an entity of type "u8 **"
-   clkPanle->active    = TRUE;
+   clkPanel->active    = TRUE;
 源码：
    bool active;
    
@@ -41,11 +41,11 @@ enum clkElement {
 3.？？？？？？？？？？？？？？？？？
 display\graphics.c(484): error:  #513: a value of type "u8 (*)[64]" cannot be assigned to an entity of type "u8 **"
 源码：
-	clkPanle->dots_buf  = panel_dotsPos;
+	clkPanel->dots_buf  = panel_dotsPos;
 	
 	u8 **dots_buf;
 	
-	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
+	u8 panel_dotsPos[PANEL_HORIZONTAL][PANEL_VERTICAL] = {0};
 	
 	两个都是2级指针，有问题吗？
     -----编译出错，不能用二级指针直接指向二维数组
@@ -61,12 +61,12 @@ display\graphics.c(484): error:  #513: a value of type "u8 (*)[64]" cannot be as
     通过p[i*n+j]访问a[i][j]
 
 3.1 display\graphics.c(353): error:  #137: expression must be a modifiable lvalue
-        clkPanle->dots_buf + X * clkPanle->width + Y = 1;  /* 是否应该dots_buf指向第0行第0列元素地址更好? */
+        clkPanel->dots_buf + X * clkPanel->width + Y = 1;  /* 是否应该dots_buf指向第0行第0列元素地址更好? */
 	源码：
-	clkPanle->dots_buf	= panel_dotsPos;	/* 第0行首地址*/
+	clkPanel->dots_buf	= panel_dotsPos;	/* 第0行首地址*/
 
 	u8 *dots_buf;
-	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
+	u8 panel_dotsPos[PANEL_HORIZONTAL][PANEL_VERTICAL] = {0};
 
 	关于expression must be a modifiable lvalue
 	描述:表达式必须是一个可以修改的左值
@@ -102,7 +102,7 @@ display\graphics.c(814): error:  #513: a value of type "u8" cannot be assigned t
   函数类型char,而return -EFAULT; 而#define EFAULT  1
   
 9.display\graphics.c(888): error:  #44: expression must have pointer type
-  panle->width 不应用->, 而应该用.
+  PANEL->width 不应用->, 而应该用.
 
 10.display\graphics.c(804): warning:  #513-D: a value of type "char *" cannot be assigned to an entity of type "u8 *"
  tmp = (char *)hour_dotspos;

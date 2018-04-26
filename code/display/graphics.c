@@ -2,7 +2,7 @@
 #include "graphics.h"
 
 struct clk_plate_prop plate;
-struct clk_panle_prop panle;
+struct clk_panel_prop panel;
 
 struct clk_hands_prop hourHand;
 struct clk_hands_prop minuHand;
@@ -302,22 +302,22 @@ static const struct angle_xy_table angle_xy_r20_tab[] = {
      { 90,  0,	 20 },
 };
 
-int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panle_prop *clkPanle)
+int arc_dot_data_to_panel(struct clk_plate_prop *clkPlate, u8 n, struct clk_panel_prop *clkPanel)
 {
-	u8 X,Y,x,y;		// X & Y is belong to panle axes, x0 & y0 are belong too
+	u8 X,Y,x,y;		// X & Y is belong to panel axes, x0 & y0 are belong too
 	char ret = 0;
 
 	if((clkPlate == NULL) || (n > clkPlate->r))
 		return (char)-EINVAL;
 
 	/*
-	 * 给出一个点，要map到panle上去
+	 * 给出一个点，要map到panel上去
 	 * 这些arc点都在第一象限45度上半部分
 	 * 现已将坐标轴上4个象限从新按顺时钟方向分成8个区域
-	 * area1 的(x,y)映射到panle的其他area上可通过MAP_AREA_x宏来实现
-	 * 上面是点(x,y)的表示,下面难点是如何标示panle里数组的下标?
-	 * panle成员panle_buf最大是128*64个字节
-	 * 表盘上(x,y)如何转换到panle_buf上(x',y')上去?
+	 * area1 的(x,y)映射到panel的其他area上可通过MAP_AREA_x宏来实现
+	 * 上面是点(x,y)的表示,下面难点是如何标示panel里数组的下标?
+	 * panel成员panel_buf最大是128*64个字节
+	 * 表盘上(x,y)如何转换到panel_buf上(x',y')上去?
 	 * (x,y)在(x0,y0)坐标系的第1象限,则x'=x0+x, y'=y0-y;  此时xx0,yy0
 	 *                                                 2           ,则x'=x0-x, y'=y0-y;  此时xx0,yy0
 	 *                                                 3           ,则x'=x0-x, y'=y0+y;  此时xx0,yy0
@@ -345,20 +345,20 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 + x;  // contain x=0, x0 contain margin
 	Y = clkPlate->y0 - y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1; // 第一象限上半部分
+	//clkPanel->dots_buf[ X][ Y] = 1; // 第一象限上半部分
 
-	/* clkPanle->dots_buf指向第0行首地址 */
-	/* (x) clkPanle->dots_buf + 1指向第1行首地址 */
-	/* (x) *(clkPanle->dots_buf + 1)指向第1行第0列元素地址,非&(clkPanle->dots_buf + 1) */
-	/* (x) *(clkPanle->dots_buf + 1) + 2 指向第1行第2列元素地址 */
-	/* (x) *(*(clkPanle->dots_buf + 1) + 2 )指向第1行第2列元素的值 */
+	/* clkPanel->dots_buf指向第0行首地址 */
+	/* (x) clkPanel->dots_buf + 1指向第1行首地址 */
+	/* (x) *(clkPanel->dots_buf + 1)指向第1行第0列元素地址,非&(clkPanel->dots_buf + 1) */
+	/* (x) *(clkPanel->dots_buf + 1) + 2 指向第1行第2列元素地址 */
+	/* (x) *(*(clkPanel->dots_buf + 1) + 2 )指向第1行第2列元素的值 */
 
-	/* clkPanle->dots_buf指向第0行首地址 */
-	/* clkPanle->dots_buf是u8 *类型的, +1不是指向二维数组下一行*/
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;  /* 是否应该dots_buf指向第0行第0列元素地址更好? */
+	/* clkPanel->dots_buf指向第0行首地址 */
+	/* clkPanel->dots_buf是u8 *类型的, +1不是指向二维数组下一行*/
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;  /* 是否应该dots_buf指向第0行第0列元素地址更好? */
 
 
 	/* 第1象限下半部分 : (x,y)->(y,x), '+' */
@@ -370,11 +370,11 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 + x;
 	Y = clkPlate->y0 - y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 
 	/* 第2象限上半部分 */
@@ -386,11 +386,11 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 - y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 	/* 第2象限下半部分 */
 	//x = -clkPlate->dots_pos[n]->y;
@@ -401,11 +401,11 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 - y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 	/* 第3象限上半部分 */
 	//x = -clkPlate->dots_pos[n]->y;
@@ -416,11 +416,11 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 + y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 	/* 第3象限下半部分 */
 	//x = -clkPlate->dots_pos[n]->x;
@@ -431,11 +431,11 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 - x;
 	Y = clkPlate->y0 + y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 	/* 第4象限上半部分 */
 	//x =  clkPlate->dots_pos[n]->x;
@@ -446,11 +446,11 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 + x;
 	Y = clkPlate->y0 + y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 	/* 第4象限下半部分 */
 	//x =  clkPlate->dots_pos[n]->y;
@@ -461,26 +461,26 @@ int arc_dot_data_to_panle(struct clk_plate_prop *clkPlate, u8 n, struct clk_panl
 	X = clkPlate->x0 + x;
 	Y = clkPlate->y0 + y;
 
-	if((X > clkPanle->height) || (Y > clkPanle->width)) {
+	if((X > clkPanel->height) || (Y > clkPanel->width)) {
 		return -EFAULT;
 	}
-	//clkPanle->dots_buf[ X][ Y] = 1;
-	*(clkPanle->dots_buf + X * clkPanle->width + Y) = 1;
+	//clkPanel->dots_buf[ X][ Y] = 1;
+	*(clkPanel->dots_buf + X * clkPanel->width + Y) = 1;
 
 	return ret;
 
 }
 
-int arc_data_to_panle(struct clk_plate_prop *clkPlate, struct clk_panle_prop *clkPanle)
+int arc_data_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *clkPanel)
 {
 	u8 i;
 	int ret=0;
 
-	if((clkPlate == NULL) || (clkPanle == NULL) || (clkPlate->active != TRUE))
+	if((clkPlate == NULL) || (clkPanel == NULL) || (clkPlate->active != TRUE))
 		return -EINVAL;
 
 	for(i=0; i<clkPlate->arc_bufsize; i++) {
-		arc_dot_data_to_panle(clkPlate, i, clkPanle);
+		arc_dot_data_to_panel(clkPlate, i, clkPanel);
 	}
 
 	return ret;
@@ -507,52 +507,52 @@ int timer_digit_data_init(struct timer_digital *digTime)
 }
 
 
-int panel_data_init(struct clk_panle_prop *clkPanle)
+int panel_data_init(struct clk_panel_prop *clkPanel)
 {
-	u8 panel_dotsPos[PANLE_HORIZONTAL][PANLE_VERTICAL] = {0};
+	u8 panel_dotsPos[PANEL_HORIZONTAL][PANEL_VERTICAL] = {0};
 	u8 cent_x, cent_y;
 	char ret = 0;
 
-	if(clkPanle == NULL)
+	if(clkPanel == NULL)
 		return -EFAULT;
 
 	/* 结构体指针中的实体变量也是虚的?*/
 	/* 那结构体指针中的变量是用指针变量还是普通变量?*/
 
-	//clkPanle->dots_buf  = panel_dotsPos;
+	//clkPanel->dots_buf  = panel_dotsPos;
 
-	//clkPanle->dots_buf  = &panel_dotsPos[0][0];
-	//clkPanle->dots_buf  = *(panel_dotsPos+0);
-	//clkPanle->dots_buf  = panel_dotsPos[0];
-	clkPanle->dots_buf  = *panel_dotsPos;		/* 第0行第0列地址*/
+	//clkPanel->dots_buf  = &panel_dotsPos[0][0];
+	//clkPanel->dots_buf  = *(panel_dotsPos+0);
+	//clkPanel->dots_buf  = panel_dotsPos[0];
+	clkPanel->dots_buf  = *panel_dotsPos;		/* 第0行第0列地址*/
 
-	//clkPanle->dots_buf	= panel_dotsPos;			/* 第0行首地址*/  /* 这样设计,编译器对使用地方报错*/
+	//clkPanel->dots_buf	= panel_dotsPos;			/* 第0行首地址*/  /* 这样设计,编译器对使用地方报错*/
 
-	//kPanle->dots_bhsize = PANLE_HORIZONTAL;
-	//kPanle->dots_bwsize = PANLE_VERTICAL;
+	//kPanel->dots_bhsize = PANEL_HORIZONTAL;
+	//kPanel->dots_bwsize = PANEL_VERTICAL;
 
-	clkPanle->plate     = &plate;
-	//clkPanle->clkScale  = &clkScale;
+	clkPanel->plate     = &plate;
+	//clkPanel->clkScale  = &clkScale;
 
-	//clkPanle->hourHand  = &hourHand;
-	//clkPanle->minuHand  = &minuHand;
-	//clkPanle->secHand   = &secHand;
+	//clkPanel->hourHand  = &hourHand;
+	//clkPanel->minuHand  = &minuHand;
+	//clkPanel->secHand   = &secHand;
 
-	cent_x = PANLE_CENT_X;
-	cent_y = PANLE_CENT_Y;
+	cent_x = PANEL_CENT_X;
+	cent_y = PANEL_CENT_Y;
 
-	clkPanle->panCenter->cx = &cent_x;
-	clkPanle->panCenter->cy = &cent_y;
+	clkPanel->panCenter->cx = &cent_x;
+	clkPanel->panCenter->cy = &cent_y;
 
-	clkPanle->height    = PANLE_HORIZONTAL;
-	clkPanle->width     = PANLE_VERTICAL;
+	clkPanel->height    = PANEL_HORIZONTAL;
+	clkPanel->width     = PANEL_VERTICAL;
 
-	clkPanle->active    = TRUE;
+	clkPanel->active    = TRUE;
 	
 	return ret;
 }
 
-int plate_cent_data_to_panle(struct plate_cent_prop *placenter)
+int plate_cent_data_to_panel(struct plate_cent_prop *placenter)
 {
 	u8 x0,y0;
 	int ret = 0;
@@ -591,7 +591,7 @@ int plateCent_data_init(struct plate_cent_prop *platecenter)
 
 	platecenter->active = TRUE;
 
-	plate_cent_data_to_panle(platecenter);
+	plate_cent_data_to_panel(platecenter);
 
 	return ret;
 }
@@ -659,7 +659,7 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 		*(tmp + i) = 0;
 	}
 
-	clkPlate->panle      = &panle;
+	clkPlate->panel      = &panel;
 	clkPlate->timer      = &digTimer;
 
 	clkPlate->hourhand   = &hourHand;
@@ -670,8 +670,8 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 	clkPlate->clkscale   = &clkScale;
 
 	clkPlate->r          = PLATE_R;
-	clkPlate->x0         = *clkPlate->panle->panCenter->cx;
-	clkPlate->y0         = *clkPlate->panle->panCenter->cy;
+	clkPlate->x0         = *clkPlate->panel->panCenter->cx;
+	clkPlate->y0         = *clkPlate->panel->panCenter->cy;
 
 	clkPlate->margin_x   = 0;
 	clkPlate->margin_y   = 0;
@@ -686,7 +686,7 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 	if(! size)
 		return -EFAULT;
 
-	ret = arc_data_to_panle(clkPlate, clkPlate->panle);
+	ret = arc_data_to_panel(clkPlate, clkPlate->panel);
 
 	return ret;
 }
@@ -819,12 +819,12 @@ int update_bresenham_line(enum clkElement type, void *param)
 		x1 = angle_xy_r26_tab[coorAngle].x;
 		y1 = angle_xy_r26_tab[coorAngle].y;
 
-		/* 时针数据要投到panle上去吗,时针数据是变化的,且要保存就要很大空间
-		  * 如果不投到panle上,则要有个功能时时刻刻更新数据到panle上(case1)
+		/* 时针数据要投到panel上去吗,时针数据是变化的,且要保存就要很大空间
+		  * 如果不投到panel上,则要有个功能时时刻刻更新数据到panel上(case1)
 		  * 能否时针数据改了后,panel打印的是时针数据,就是说用指针指向时针数据?(case2)
-		  * 我还是选case1. case2是零散数据,到后来多个icon会出现多处扫描panle
+		  * 我还是选case1. case2是零散数据,到后来多个icon会出现多处扫描panel
 		  * 对于case1, 先要得到/统计圆心所在坐标系中要打印1的点坐标(x & y)
-		  *                      再保存到panle的buf中
+		  *                      再保存到panel的buf中
 		  */
 
 		//BresenhamLine(x0,y0,x1,y1);
@@ -890,7 +890,7 @@ int hour_hand_data_init(struct clk_hands_prop *hourhand)
 	  */
 
 	ret = update_bresenham_line(CLK_HOUR_HAND, (void *)hourhand);
-	//ret = hourhand_data_to_panle();
+	//ret = hourhand_data_to_panel();
 
 	return ret;
 }
@@ -915,11 +915,11 @@ int second_hand_data_init(struct clk_hands_prop *sechand)
 	return ret;
 }
 
-char clk_panle_init(void)
+char clk_panel_init(void)
 {
 	char ret = 0;
 
-	panel_data_init(&panle);
+	panel_data_init(&panel);
 
 	plate_data_init(&plate);
 
@@ -927,7 +927,7 @@ char clk_panle_init(void)
 
 	timer_digit_data_init(&digTimer);
 
-	plate_scale_data_init(&clkScale);  // panle
+	plate_scale_data_init(&clkScale);  // panel
 
 	hour_hand_data_init(&hourHand);
 
@@ -938,15 +938,15 @@ char clk_panle_init(void)
 	return ret;
 }
 
-int draw_panle_graphics(void)
+int draw_panel_graphics(void)
 {
 	u8 i,j;
 	int ret = 0;
 
-	for(i=0; i<panle.width; i++) {
-		for(j=0; j<panle.height; j++) {
+	for(i=0; i<panel.width; i++) {
+		for(j=0; j<panel.height; j++) {
 			ret = 0;
-			//draw_dots(panle->dots_buf[i][j]);
+			//draw_dots(panel->dots_buf[i][j]);
 		}
 	}
 

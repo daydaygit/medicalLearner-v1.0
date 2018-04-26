@@ -32,10 +32,10 @@ typedef enum {
 #define CKL_SEC_HAND_BEXTRA          4
 
 
-#define PANLE_CENT_X                 32
-#define PANLE_CENT_Y                 32
-#define PANLE_HORIZONTAL             64
-#define PANLE_VERTICAL               64
+#define PANEL_CENT_X                 32
+#define PANEL_CENT_Y                 32
+#define PANEL_HORIZONTAL             64
+#define PANEL_VERTICAL               64
 
 #define PLATE_X0_POS                 32
 #define PLATE_Y0_POS                 32
@@ -71,15 +71,15 @@ struct dot_pos {
 	u8 y;
 };
 /*
-  * panle 和plate 有什么区别???
-  * panle设计为一个矩形区域,plate是时钟表盘,放在panle上
+  * panel 和plate 有什么区别???
+  * panel设计为一个矩形区域,plate是时钟表盘,放在panel上
   */
 struct clk_plate_prop {
 	u8 x0;		/* origin x */
 	u8 y0;
 	u8 r;
 
-	u8 margin_x;	// gap between plate edge and panle edge
+	u8 margin_x;	// gap between plate edge and panel edge
 	u8 margin_y;
 
 	struct timer_digital *timer;
@@ -94,7 +94,7 @@ struct clk_plate_prop {
 	struct plate_cent_prop *platcenter;
 	struct clk_scale_prop  *clkscale;
 
-	struct clk_panle_prop  *panle;
+	struct clk_panel_prop  *panel;
 
 	struct dot_pos         *endpoint;   /* used for scale, hourhand, minuhand, sechand */
 
@@ -167,7 +167,7 @@ struct plate_cent_prop {
 	bool active;
 };
 
-struct clk_panle_prop {
+struct clk_panel_prop {
 	//struct clk_coordinate *clkCenter;
 
 	u8 height;
@@ -181,8 +181,8 @@ struct clk_panle_prop {
 	struct clk_hands_prop *minuHand;
 	struct clk_hands_prop *secHand;
 
-	//struct panle_dots_buf *dots_buf;
-	//struct panle_dots_buf **dots_buf;
+	//struct panel_dots_buf *dots_buf;
+	//struct panel_dots_buf **dots_buf;
 	//u8 **dots_buf;
 	u8 *dots_buf;
 	// dots_bhsize;		/* buf height size */  /* can be placedwith height & width above */
