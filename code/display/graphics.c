@@ -242,23 +242,19 @@ int set_panel_dot(struct clk_panel_prop *clkPanel, u8 X, u8 Y)
 	y1 = (Y / 8);
 	y2 = (Y % 8);					/* 可理解成一个字节的第几个bit */
 
-	if((y1==0)) {				 	//第一行,即LCD第0页
-		m = ax;
-	} else if((y1==1)){			 	// line 2, page1
-		m = clkPanel->width *1 +ax;
-	} else if((y1==2)){			 	// line 3, page2
-		m = clkPanel->width *2 +ax;
-	} else if((y1==3)){			 	// line 4 page3
-		m = clkPanel->width *3 +ax;
-	} else if((y1==4)){			 	// line 5, page4
-		m = clkPanel->width *4 +ax;
-	} else if((y1==5)){			 	// line 6, page5
-		m = clkPanel->width *5 +ax;
-	} else if((y1==6)){			 	// line 7, page6
-		m = clkPanel->width *6 +ax;
-	} else if((y1==7)){			 	// line 8, page7
-		m = clkPanel->width *7 +ax;
-	}
+#if 0
+	if((y1==0))     {	m = ax;				}	//第一行,即LCD第0页
+	else if((y1==1)){	m = clkPanel->width *1 +ax;	}	// line 2, page1
+	else if((y1==2)){	m = clkPanel->width *2 +ax;	}	// line 3, page2
+	else if((y1==3)){	m = clkPanel->width *3 +ax;	}	// line 4, page3
+	else if((y1==4)){	m = clkPanel->width *4 +ax;	}	// line 5, page4
+	else if((y1==5)){	m = clkPanel->width *5 +ax;	}	// line 6, page5
+	else if((y1==6)){	m = clkPanel->width *6 +ax;	}	// line 7, page6
+	else if((y1==7)){	m = clkPanel->width *7 +ax;	}	// line 8, page7
+
+#else
+	m = clkPanel->width * y1 + ax; 					// line (y1+1), page-y1
+#endif
 
 	*(clkPanel->dots_buf + m) |= 1 << y2;
 
