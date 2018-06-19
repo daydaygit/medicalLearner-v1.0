@@ -15,6 +15,13 @@ struct clk_scale_prop  clkScale;
 struct timer_digital   digTimer;
 
 
+#if ENABLE_DYNAMIC_TIME
+volatile unsigned int dateTime[6] = {2018, 4, 1, 0, 4, 47};
+volatile char update_panel_enable = 0;
+
+int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type);
+#endif
+
 int arc_dot_data_to_panel(struct clk_plate_prop *clkPlate, u8 n, struct clk_panel_prop *clkPanel)
 {
 	u8 X,Y,x,y;		// X & Y is belong to panel axes, x0 & y0 are belong too
@@ -208,13 +215,23 @@ int timer_digit_data_init(struct timer_digital *digTime)
 
 	digTime->plate  = &plate;
 
-	digTime->year   = 0;
-	digTime->month  = 0;
-	digTime->day    = 0;
+#if ENABLE_DYNAMIC_TIME
+	digTime->year	= &dateTime[0];
+	digTime->month	= &dateTime[1];
+	digTime->day	= &dateTime[2];
 
-	digTime->hour   = 0;
-	digTime->minute = 0;
-	digTime->second = 0;
+	digTime->hour	= &dateTime[3];
+	digTime->minute = &dateTime[4];
+	digTime->second = &dateTime[5];  /*  dateTime+5*d  */
+#else
+	digTime->year	= 0;
+	digTime->month	= 0;
+	digTime->day	= 0;
+
+	digTime->hour	= 10;
+	digTime->minute = 21;
+	digTime->second = 13;
+#endif
 
 	return ret;
 }
