@@ -596,13 +596,13 @@ char clk_panel_init(void)
 {
 	char ret = 0;
 
+	timer_digit_data_init(&digTimer);
+
 	panel_data_init(&panel);
 
 	plate_data_init(&plate);
 
 	plateCent_data_init(&plateCenter);
-
-	timer_digit_data_init(&digTimer);
 
 	plate_scale_data_init(&clkScale);  // panel
 
