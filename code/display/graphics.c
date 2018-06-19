@@ -16,9 +16,10 @@ struct timer_digital   digTimer;
 
 
 //struct dot_pos  sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID] = {0};
-
+//struct dot_pos minu_dotspos_buf[CLK_MHAND_LEN * CLK_MHAND_WID] = {0};
 
 struct dot_pos  sec_dotspos_buf[26] = {0};
+struct dot_pos minu_dotspos_buf[23] = {0};
 #if ENABLE_DYNAMIC_TIME
 volatile unsigned int dateTime[6] = {2018, 4, 1, 0, 4, 47};
 volatile char update_panel_enable = 0;
@@ -576,12 +577,43 @@ int hour_hand_data_init(struct clk_hands_prop *hourhand)
 	return ret;
 }
 
-int minute_hand_data_init(struct clk_hands_prop *minuhand)
+int minute_hand_data_init(struct clk_hands_prop *minuhand, struct timer_digital *dtimer)
 {
-	char ret = 0;
+	u8 i, *tmp = NULL;
+	int ret = 0;
 
 	if(minuhand == NULL)
 		return -EFAULT;
+
+	tmp = (u8 *)minu_dotspos_buf;
+	for(i=0; i<sizeof(minu_dotspos_buf);i++) {
+		*(tmp + i) = 0;
+	}
+
+	minuhand->plate	  = &plate;
+
+	minuhand->x0 	  = minuhand->plate->x0;
+	minuhand->y0 	  = minuhand->plate->y0;
+
+	minuhand->handLen  = CLK_MHAND_LEN;
+	minuhand->handwide = CLK_MHAND_WID;
+#if 0
+	minuhand->Htimer   = &minuhand->plate->timer->hour;  /* Htimer ×÷ÓÃ?*/
+#else
+	minuhand->time	 = dtimer->minute;
+#endif
+
+	minuhand->angle	  = 0;
+
+	minuhand->dots_pos = minu_dotspos_buf;
+	//minuhand->dotPos_buf_size = sizeof(minu_dotspos_buf);
+	minuhand->dotPos_buf_size = sizeof(minu_dotspos_buf) / sizeof(minu_dotspos_buf[0]);
+
+#if 1
+	draw_kinds_line(minuhand->plate->panel, LINE_MINUTE);
+#endif
+
+	minuhand->active   = TRUE;
 
 	return ret;
 }
@@ -644,7 +676,7 @@ char clk_panel_init(void)
 
 	hour_hand_data_init(&hourHand);
 
-	minute_hand_data_init(&minuHand);
+	minute_hand_data_init(&minuHand, &digTimer);
 
 	second_hand_data_init(&secHand, &digTimer);
 
