@@ -15,6 +15,10 @@ struct clk_scale_prop  clkScale;
 struct timer_digital   digTimer;
 
 
+//struct dot_pos  sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID] = {0};
+
+
+struct dot_pos  sec_dotspos_buf[26] = {0};
 #if ENABLE_DYNAMIC_TIME
 volatile unsigned int dateTime[6] = {2018, 4, 1, 0, 4, 47};
 volatile char update_panel_enable = 0;
@@ -584,12 +588,13 @@ int minute_hand_data_init(struct clk_hands_prop *minuhand)
 
 int second_hand_data_init(struct clk_hands_prop *sechand, struct timer_digital *dtimer)
 {
-	struct dot_pos sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID];
+//	struct dot_pos sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID];
 	u8 i, *tmp = NULL;
 	int ret = 0;
 
 	if(sechand == NULL)
 		return -EFAULT;
+
 	tmp = (u8 *)sec_dotspos_buf;
 	for(i=0; i<sizeof(sec_dotspos_buf);i++) {
 		*(tmp + i) = 0;
@@ -607,10 +612,13 @@ int second_hand_data_init(struct clk_hands_prop *sechand, struct timer_digital *
 #else
 	sechand->time	 = dtimer->second;
 #endif
+
 	sechand->angle    = 0;
 
 	sechand->dots_pos = sec_dotspos_buf;
-	sechand->dotPos_buf_size = sizeof(sec_dotspos_buf);
+//	sechand->dotPos_buf_size = sizeof(sec_dotspos_buf);
+	sechand->dotPos_buf_size = sizeof(sec_dotspos_buf) / sizeof(sec_dotspos_buf[0]);
+
 #if 1
 	draw_kinds_line(sechand->plate->panel, LINE_SECOND);
 #endif
