@@ -662,7 +662,40 @@ int plate_scale_data_init(struct clk_scale_prop *clkscale)
 
 int plateCent_data_to_panel(struct plate_cent_prop *plaCenter)
 {
+	u8 panelCenter_x, panelCenter_y;
+	struct clk_panel_prop  *pan;
+	u8 x0,y0;
+	int m, n;
 	int ret = 0;
+
+	if((plaCenter == NULL) || (plaCenter->plate == NULL))
+		return -EFAULT;
+
+	pan           = plaCenter->plate->panel;
+
+	panelCenter_x = *(plaCenter->plate->panel->panCenter->cx);
+	panelCenter_y = *(plaCenter->plate->panel->panCenter->cy);
+
+
+	m = panelCenter_x;
+	n = panelCenter_y;
+	ret = set_panel_dot(pan, m, n);
+
+	m = panelCenter_x + 1;
+	n = panelCenter_y;
+	ret = set_panel_dot(pan, m, n);
+
+	m = panelCenter_x - 1;
+	n = panelCenter_y;
+	ret = set_panel_dot(pan, m, n);
+
+	m = panelCenter_x;
+	n = panelCenter_y + 1;
+	ret = set_panel_dot(pan, m, n);
+
+	m = panelCenter_x;
+	n = panelCenter_y - 1;
+	ret = set_panel_dot(pan, m, n);
 
 	return ret;
 }
