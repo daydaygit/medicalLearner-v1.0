@@ -13,6 +13,11 @@ struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];
 
 //plate-scale
 struct clk_scale_prop  clkScale;
+
+//plate center dot
+u8 circ_cent_buf[CIRCLE_CENT_BSZ] = {1,1,1,1,1};  /* Left,Right,Up,Down,Center */
+
+//hand
 struct clk_hands_prop hourHand;
 struct clk_hands_prop minuHand;
 struct clk_hands_prop secHand;
@@ -651,6 +656,37 @@ int plate_scale_data_init(struct clk_scale_prop *clkscale)
 		return -EFAULT;
 
 																																																																																																										
+
+	return ret;
+}
+
+int plateCent_data_to_panel(struct plate_cent_prop *plaCenter)
+{
+	int ret = 0;
+
+	return ret;
+}
+
+int plateCent_data_init(struct plate_cent_prop *platecenter)
+{
+	//u8 circ_cent_buf[CIRCLE_CENT_BSZ] = {1,1,1,1,1};
+	int ret = 0;
+
+	if(platecenter == NULL)
+		return -EFAULT;
+
+	platecenter->plate = &plate;
+
+	platecenter->centDot     = &centerDot;
+	platecenter->centDot->cx = &platecenter->plate->x0; /*recode center dot's x,y coordinate */
+	platecenter->centDot->cy = &platecenter->plate->y0; /*platecenter中心指向plate的中心。但platecenter坐标不参与plateCent_data_to_panel运算*/
+
+	platecenter->cent_buf = circ_cent_buf;
+
+	//plateCent_data_to_panel(platecenter->plate->panel);
+	plateCent_data_to_panel(platecenter);
+
+	platecenter->active = TRUE;
 
 	return ret;
 }
