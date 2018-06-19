@@ -582,12 +582,40 @@ int minute_hand_data_init(struct clk_hands_prop *minuhand)
 	return ret;
 }
 
-int second_hand_data_init(struct clk_hands_prop *sechand)
+int second_hand_data_init(struct clk_hands_prop *sechand, struct timer_digital *dtimer)
 {
-	char ret = 0;
+	struct dot_pos sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID];
+	u8 i, *tmp = NULL;
+	int ret = 0;
 
 	if(sechand == NULL)
 		return -EFAULT;
+	tmp = (u8 *)sec_dotspos_buf;
+	for(i=0; i<sizeof(sec_dotspos_buf);i++) {
+		*(tmp + i) = 0;
+	}
+
+	sechand->plate    = &plate;
+
+	sechand->x0       = sechand->plate->x0;
+	sechand->y0       = sechand->plate->y0;
+
+	sechand->handLen  = CLK_SHAND_LEN;
+	sechand->handwide = CLK_SHAND_WID;
+#if 0
+	sechand->Htimer   = &sechand->plate->timer->hour;  /* Htimer ×÷ÓÃ?*/
+#else
+	sechand->time	 = dtimer->second;
+#endif
+	sechand->angle    = 0;
+
+	sechand->dots_pos = sec_dotspos_buf;
+	sechand->dotPos_buf_size = sizeof(sec_dotspos_buf);
+#if 1
+	draw_kinds_line(sechand->plate->panel, LINE_SECOND);
+#endif
+
+	sechand->active   = TRUE;
 
 	return ret;
 }
@@ -610,7 +638,7 @@ char clk_panel_init(void)
 
 	minute_hand_data_init(&minuHand);
 
-	second_hand_data_init(&secHand);
+	second_hand_data_init(&secHand, &digTimer);
 
 	return ret;
 }
