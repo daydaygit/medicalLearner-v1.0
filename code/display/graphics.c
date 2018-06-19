@@ -17,9 +17,10 @@ struct timer_digital   digTimer;
 
 //struct dot_pos  sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID] = {0};
 //struct dot_pos minu_dotspos_buf[CLK_MHAND_LEN * CLK_MHAND_WID] = {0};
-
+//struct dot_pos hour_dotspos_buf[CLK_HHAND_LEN * CLK_HHAND_WID] = {0};
 struct dot_pos  sec_dotspos_buf[26] = {0};
 struct dot_pos minu_dotspos_buf[23] = {0};
+struct dot_pos hour_dotspos_buf[20] = {0};
 #if ENABLE_DYNAMIC_TIME
 volatile unsigned int dateTime[6] = {2018, 4, 1, 0, 4, 47};
 volatile char update_panel_enable = 0;
@@ -531,18 +532,17 @@ int transfer_humAngle_to_axesAngle(int humAngle)
 	return angle;
 }
 
-int hour_hand_data_init(struct clk_hands_prop *hourhand)
+int hour_hand_data_init(struct clk_hands_prop *hourhand, struct timer_digital *dtimer)
 {
 	u8 i, *tmp = NULL;
-	struct dot_pos hour_dotspos[CLK_HHAND_LEN * CLK_HHAND_WID];
-
-	char ret = 0;
+	//struct dot_pos hour_dotspos_buf[CLK_HHAND_LEN * CLK_HHAND_WID];
+	int ret = 0;
 
 	if(hourhand == NULL)
 		return -EFAULT;
 
-	tmp = (u8 *)hour_dotspos;
-	for(i=0; i<sizeof(hour_dotspos);i++) {
+	tmp = (u8 *)hour_dotspos_buf;
+	for(i=0; i<sizeof(hour_dotspos_buf);i++) {
 		*(tmp + i) = 0;
 	}
 
@@ -553,11 +553,21 @@ int hour_hand_data_init(struct clk_hands_prop *hourhand)
 
 	hourhand->handLen  = CLK_HHAND_LEN;
 	hourhand->handwide = CLK_HHAND_WID;
-
+#if 0
 	hourhand->Htimer   = &hourhand->plate->timer->hour;
+#else
+	hourhand->time   = dtimer->hour;
+#endif
 	hourhand->angle    = 0;
 
-	hourhand->dots_pos = hour_dotspos;
+	hourhand->dots_pos = hour_dotspos_buf;
+	//hourhand->dotPos_buf_size = sizeof(hour_dotspos_buf);
+	hourhand->dotPos_buf_size = sizeof(hour_dotspos_buf) / sizeof(hour_dotspos_buf[0]);
+
+#if 1
+	draw_kinds_line(hourhand->plate->panel, LINE_HOUR);
+
+#endif
 
 	hourhand->active   = TRUE;
 
@@ -674,7 +684,7 @@ char clk_panel_init(void)
 
 	plate_scale_data_init(&clkScale);  // panel
 
-	hour_hand_data_init(&hourHand);
+	hour_hand_data_init(&hourHand, &digTimer);
 
 	minute_hand_data_init(&minuHand, &digTimer);
 
