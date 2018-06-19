@@ -1,13 +1,15 @@
 #include <stm32f10x.h>		// u8
 #include "graphics.h"
 
+struct clk_panel_prop panel;
 //panel
 struct icon_center  pancenter;
 u8 panel_cent_x, panel_cent_y;
 
 //plate
 struct clk_plate_prop plate;
-struct clk_panel_prop panel;
+struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];
+
 
 //plate-scale
 struct clk_scale_prop  clkScale;
@@ -34,7 +36,43 @@ volatile char update_panel_enable = 0;
 
 int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type);
 #endif
-
+/*const */ struct dot_pos endpoint_r30_on_plate[ENDPOINT_FOR_R30] = {
+#if 1
+			{  0, 30 },
+			{  3, 30 },
+			{  6, 30 },
+			{  9, 29 },
+			{ 12, 28 },
+			{ 15, 27 },
+			{ 18, 25 },   //{ 17, 24 },  // 同时buf数据要修正下
+			{ 20, 23 },
+			{ 23, 20 },
+			{ 25, 18 },
+			{ 27, 15 },
+			{ 28, 12 },
+			{ 29,  9 },
+			{ 30,  6 },
+			{ 30,  3 },
+			{ 30,  0 },
+#else
+			{  0, 30 },
+			{  3, 30 },
+			{  6, 30 },
+			{  9, 29 },
+			{ 12, 28 },
+			{ 15, 27 },
+			{ 18, 25 },
+			{ 21, 22 },
+			{ 23, 20 },
+			{ 24, 18 },
+			{ 26, 15 },
+			{ 28, 12 },
+			{ 29,  9 },
+			{ 30,  6 },
+			{ 30,  3 },
+			{ 30,  0 },
+#endif
+};
 
 /*const */u8 panel_64x64_data[512]={
 	/* default data : */
@@ -370,6 +408,13 @@ int arc_data_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *cl
 	return ret;
 }
 
+int cast_arc_dots_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *clkPanel)
+{
+	int ret=0;
+
+	return ret;
+}
+
 int timer_digit_data_init(struct timer_digital *digTime)
 {
 	int ret =0;
@@ -489,6 +534,13 @@ int plateCent_data_init(struct plate_cent_prop *platecenter)
 	return ret;
 }
 
+int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
+{
+	int ret = 0;
+
+	return ret;
+}
+
 int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 {
 	u8 x,y,i = 0;
@@ -538,7 +590,7 @@ int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
 
 int plate_data_init(struct clk_plate_prop *clkPlate)
 {
-	struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];	/* 结构体数组*/
+//	struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];	/* 结构体数组*/
 	u8 i, *tmp = NULL;
 	u8 size;
 	char ret = 0;
@@ -569,17 +621,24 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 	clkPlate->margin_x   = 0;
 	clkPlate->margin_y   = 0;
 
-	//clkPlate->dots_pos   = &plate_dotsPos_buf;	/* 1维结构体数组名还是代表数组首地址*/
+	//clkPlate->dots_pos   = &plate_dotsPos_buf;
 	clkPlate->dots_pos   = plate_dotsPos_buf;
 	clkPlate->arc_bufsize = sizeof(plate_dotsPos_buf);	/* default size */
 
-	clkPlate->active     = TRUE;
+	clkPlate->endpoint    = endpoint_r30_on_plate;
 
-	size = bresenham_circle_plate(clkPlate);
-	if(! size)
+	size = bresenham_algorithm_create_arc_dots(clkPlate);
+	if(! size) {
 		return -EFAULT;
+	} else {
+		clkPlate->arc_bufsize = size;			// updata arc_bufsize
+	}
 
-	ret = arc_data_to_panel(clkPlate, clkPlate->panel);
+	clkPlate->active	 = TRUE;
+
+#if ENABLE_FULL_PATTERN
+	ret = cast_arc_dots_to_panel(clkPlate, clkPlate->panel);
+#endif
 
 	return ret;
 }
