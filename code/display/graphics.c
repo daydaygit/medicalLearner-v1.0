@@ -13,7 +13,8 @@ struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];
 
 //plate-scale
 struct clk_scale_prop  clkScale;
-struct dot_pos scaleBuffer[SCALE_8thPART_SIZE][SCALE_LEN] = {0};
+//struct dot_pos scaleBuffer[SCALE_8thPART_SIZE][SCALE_LEN] = {0};
+struct dot_pos scaleBuffer[ENDPOINT_FOR_R30][SCALE_LEN] = {0};  //应该选用1/8圆弧上通过描点法找到第一象限的15个点
 
 //plate center dot
 u8 circ_cent_buf[CIRCLE_CENT_BSZ] = {1,1,1,1,1};  /* Left,Right,Up,Down,Center */
@@ -696,7 +697,8 @@ int plate_scale_data_init(struct clk_scale_prop *clkscale)
 	if(clkscale == NULL)
 		return -EFAULT;
 
-	clkscale->scaleBuf = scaleBuffer[0];
+	//clkscale->scaleBuf = scaleBuffer[0];		// scaleBuf指向第0行第0列元素地址
+	clkscale->scaleBuf = scaleBuffer;		// scaleBuf指向第0行首地址
 	//clkscale->size   = SCALE_8thPART_SIZE;
 	clkscale->size	 = ENDPOINT_FOR_R30;		// 1/8圆弧可能有26个点,但scale对应圆弧中不连续而又平均的点，通过excel描点找到是15个点
 	clkscale->len    = SCALE_LEN;
