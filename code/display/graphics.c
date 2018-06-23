@@ -13,6 +13,7 @@ struct dot_pos plate_dotsPos_buf[CLK_PLATE_8thARC_SIZE];
 
 //plate-scale
 struct clk_scale_prop  clkScale;
+struct dot_pos scaleBuffer[SCALE_8thPART_SIZE][SCALE_LEN] = {0};
 
 //plate center dot
 u8 circ_cent_buf[CIRCLE_CENT_BSZ] = {1,1,1,1,1};  /* Left,Right,Up,Down,Center */
@@ -571,6 +572,13 @@ int plateCent_data_init(struct plate_cent_prop *platecenter)
 	return ret;
 }
 
+int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
+{
+	int ret = 0;
+
+	return ret;
+}
+
 int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 {
 	int ret = 0;
@@ -682,12 +690,23 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 
 int plate_scale_data_init(struct clk_scale_prop *clkscale)
 {
+	struct dot_pos buf[SCALE_R] = {0};
 	int ret = 0;
 
 	if(clkscale == NULL)
 		return -EFAULT;
 
-																																																																																																										
+	clkscale->scaleBuf = scaleBuffer[0];
+	//clkscale->size   = SCALE_8thPART_SIZE;
+	clkscale->size	 = ENDPOINT_FOR_R30;		// 1/8圆弧可能有26个点,但scale对应圆弧中不连续而又平均的点，通过excel描点找到是15个点
+	clkscale->len    = SCALE_LEN;
+
+	clkscale->r      = SCALE_R;
+
+	clkscale->plate  = &plate; 
+	draw_kinds_line(clkscale->plate->panel, LINE_SCALE);
+
+	clkscale->active = TRUE;
 
 	return ret;
 }
