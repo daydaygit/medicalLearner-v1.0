@@ -279,10 +279,10 @@ int arc_dot_data_to_panel(struct clk_plate_prop *clkPlate, u8 n, struct clk_pane
 	 * 上面是点(x,y)的表示,下面难点是如何标示panel里数组的下标?
 	 * panel成员panel_buf最大是128*64个字节
 	 * 表盘上(x,y)如何转换到panel_buf上(x',y')上去?
-	 * (x,y)在(x0,y0)坐标系的第1象限,则x'=x0+x, y'=y0-y;  此时xx0,yy0
-	 *                                                 2           ,则x'=x0-x, y'=y0-y;  此时xx0,yy0
-	 *                                                 3           ,则x'=x0-x, y'=y0+y;  此时xx0,yy0
-	 *                                                 4           ,则x'=x0+x, y'=y0+y;  此时xx0,yy0
+	 * (x,y)在(x0,y0)坐标系的第1象限,则x'=x0+x, y'=y0-y;
+	 *                                                 2           ,则x'=x0-x, y'=y0-y;
+	 *                                                 3           ,则x'=x0-x, y'=y0+y;
+	 *                                                 4           ,则x'=x0+x, y'=y0+y;
 	 *                                  x轴正半轴上,则x'=x0+x, y'=0    ;  此时xx0,yy0
 	 *                                  x轴负半轴上,则x'=x0-x, y'=0     ;  此时xx0,yy0
 	 *                                  y轴正半轴上,则x'=x0,     y'=y0-y;  此时xx0,yy0
@@ -447,13 +447,107 @@ int arc_data_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *cl
 	return ret;
 }
 
-int cast_arc_dots_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *clkPanel)
+
+/* arc_dots_to_panel()将bresenham算法得到的arc数据投到panel上
+  *  panel和arc数据需要有个共同基点:panel中心和arc圆心在同一个位置!!!
+  *  clkPlate->dots_pos指向的数组中的数据(x,y)都是相对原点的坐标
+  *  arc的数据本属于plate的,但是简便来可直接投到panel上去,否则空间占用大
+  *  arc是1/8圆周
+  */
+int arc_dots_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *clkPanel, u8 n)
 {
-	int ret=0;
+	u8 X,Y,x,y,ax,ay;               /* X & Y is belong to panel axes, (X<= clkPanel->width<=64<128, Y<= clkPanel->height<=64)
+                                         * x & y是1/8圆弧arc数据坐标,且在第一象限直线y=x上方转换到panel上后的坐标
+                                         * ax & ay是clkPanel->dots_buf指向的(64x64)数组中的成员下标*/
+	u8 y1,y2,m,b,v;
+	char ret = 0;
+
+	if((clkPlate == NULL) || (n > clkPlate->r))
+		return (char)-EINVAL;
+
+	/*
+	 * 给出一个点，要map到panel上去
+	 * 这些arc点都在第一象限45度上半部分
+	 * 现已将坐标轴上4个象限从新按顺时钟方向分成8个区域
+	 * area1 的(x,y)映射到panel的其他area上可通过MAP_AREA_x宏来实现
+	 * 上面是点(x,y)的表示,下面难点是如何标示panel里数组的下标?
+	 * panel成员panel_buf最大是128*64个字节
+	 * 表盘上(x,y)如何转换到panel_buf上(x',y')上去?
+	 * (1)(x,y)在(x0,y0)坐标系的第1象限,则x'=x0+x, y'=y0-y;
+	 * (2)                        2象限,则x'=x0-x, y'=y0-y;
+	 * (3)                        3象限,则x'=x0-x, y'=y0+y;
+	 * (4)                        4象限,则x'=x0+x, y'=y0+y;
+	 * (5)                        x轴正半轴上,则x'=x0+x, y'=0;
+	 * (6)                        x轴负半轴上,则x'=x0-x, y'=0;
+	 * (7)                        y轴正半轴上,则x'=x0,    y'=y0-y;
+	 * (8)                        y轴负半轴上,则x'=x0,    y'=y0+y
+	 */
+
+	/* 1/8圆弧实际就是部分表盘plate，所以两者的圆心是同一个
+	 *  将圆弧数组坐标转成panel上坐标,注意是一个dot，不是一个字节
+	 *  再将dot转成一个数组成员(字节)中的某一bit位上
+	 */
+
+	x = (clkPlate->dots_pos + n)->x;
+	y = (clkPlate->dots_pos + n)->y;
+
+	/* 第1象限上半部分 */
+	X = *(clkPanel->panCenter->cx) + x;
+	Y = *(clkPanel->panCenter->cy) - y;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第2象限上半部分 */
+	X = *(clkPanel->panCenter->cx) - x;
+	Y = *(clkPanel->panCenter->cy) - y;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第3象限上半部分 */
+	X = *(clkPanel->panCenter->cx) - y;
+	Y = *(clkPanel->panCenter->cy) + x;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第4象限上半部分 */
+	X = *(clkPanel->panCenter->cx) + y;
+	Y = *(clkPanel->panCenter->cy) + x;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第1象限下半部分 */
+	X = *(clkPanel->panCenter->cx) + y;
+	Y = *(clkPanel->panCenter->cy) - x;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第2象限下半部分 */
+	X = *(clkPanel->panCenter->cx) - y;
+	Y = *(clkPanel->panCenter->cy) - x;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第4象限下半部分 */
+	X = *(clkPanel->panCenter->cx) + x;
+	Y = *(clkPanel->panCenter->cy) + y;
+	ret = set_panel_dot(clkPanel, X, Y);
+
+	/* 第3象限下半部分 */
+	X = *(clkPanel->panCenter->cx) - x;
+	Y = *(clkPanel->panCenter->cy) + y;
+	ret = set_panel_dot(clkPanel, X, Y);
 
 	return ret;
 }
 
+int cast_arc_dots_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_prop *clkPanel)
+{
+	u8 i;
+	int ret=0;
+
+	if((clkPlate == NULL) || (clkPlate->active != TRUE) || (clkPanel == NULL))
+		return -EINVAL;
+
+	for(i=0; i<clkPlate->arc_bufsize; i++) {
+		arc_dots_to_panel(clkPlate, clkPanel, i);
+	}
+
+	return ret;
+}
 int timer_digit_data_init(struct timer_digital *digTime)
 {
 	int ret =0;
