@@ -470,7 +470,19 @@ int panel_data_init(struct clk_panel_prop *clkPanel)
 
 int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
+	int i, j, k, sz, cnt;
 	int ret = 0;
+	int m,n;
+	int t;
+	int handDiff;
+
+	/* 圆环和12个刻度是固定不变的,可以用1/8 part来表示；
+	 * 圆环不可能上面所有坐标都放到内存里,因为如果r很大需要很多数据；
+	 * 而12个刻度完全可以绑定到圆环上；
+	 * 而每秒的时分秒针是要变的*/
+
+	sz=sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);
+	/* 依据endpoint_r30_on_plate[]中16个终点和原点(0,0)生成第1象限中scale数据*/	
 
 	return ret;
 }
