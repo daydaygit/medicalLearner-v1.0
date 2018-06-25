@@ -468,7 +468,8 @@ int panel_data_init(struct clk_panel_prop *clkPanel)
 }
 
 
-int line_get_endpoint_base_linetable_and_arcdate(u8 r, int angle, struct dot_pos *endpoint, enum LINE_TYPE type)
+//int line_get_endpoint_base_linetable_and_arcdate(u8 r, int angle, struct dot_pos *endpoint, enum LINE_TYPE type)
+int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint, enum LINE_TYPE type)
 {
 	int size = 0, ret = 0;
 
@@ -496,7 +497,8 @@ int line_get_endpoint_base_linetable_and_arcdate(u8 r, int angle, struct dot_pos
 
 	/*体现在struct dot_pos endpoint_r30_on_plate[16]*/
 
-	endpoint = endpoint_r30_on_plate;
+//	endpoint = endpoint_r30_on_plate;
+	*endpoint = endpoint_r30_on_plate;
 	size = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);
 
 	return size;
@@ -516,7 +518,9 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	 * 而每秒的时分秒针是要变的*/
 
 //	sz = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);  /* 依据endpoint_r30_on_plate[]中16个终点和原点(0,0)生成第1象限中scale数据*/
-	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL); /* size和其他变量一样，也丢到一个函数中处理 */
+//	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL); /* size和其他变量一样，也丢到一个函数中处理 */
+//	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, endpoint_r30, LINE_ALL);
+	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, &endpoint_r30, LINE_ALL);
 
 	return ret;
 }
