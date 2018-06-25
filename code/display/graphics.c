@@ -507,8 +507,11 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 	y = clkPlate->r;
 	d = 3 - 2 * clkPlate->r;
 
-	clkPlate->dots_pos[0]->x = x;
-	clkPlate->dots_pos[0]->y = y;
+	//clkPlate->dots_pos[0]->x = x;	// dots_pos是指针，不能这么表达!!!!!!
+	//clkPlate->dots_pos[0]->y = y;
+
+	(clkPlate->dots_pos+0)->x = x;
+	(clkPlate->dots_pos+0)->y = y;
 
 	while(x<y) {
 		++i;
