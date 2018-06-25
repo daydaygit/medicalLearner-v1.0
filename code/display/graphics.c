@@ -467,49 +467,6 @@ int panel_data_init(struct clk_panel_prop *clkPanel)
 	return ret;
 }
 
-int plate_cent_data_to_panel(struct plate_cent_prop *placenter)
-{
-	u8 x0,y0;
-	int ret = 0;
-
-	if((placenter == NULL) || (placenter->plate == NULL) || (placenter->active != TRUE))
-		return -EFAULT;
-
-	x0 = *placenter->plaCenter->cx;
-	y0 = *placenter->plaCenter->cy;
-
-#if 0
-	placenter->plate->dots_pos[x0][y0]   = placenter->cent_buf[0];
-	placenter->plate->dots_pos[x0][y0+1] = placenter->cent_buf[1];
-	placenter->plate->dots_pos[x0][y0-1] = placenter->cent_buf[2];
-	placenter->plate->dots_pos[x0+1][y0] = placenter->cent_buf[3];
-	placenter->plate->dots_pos[x0-1][y0] = placenter->cent_buf[4];
-#endif
-
-	return ret;
-}
-
-int plateCent_data_init(struct plate_cent_prop *platecenter)
-{
-	u8 circ_cent_buf[CIRCLE_CENT_BSZ] = {1,1,1,1,1};
-	int ret = 0;
-
-	if(platecenter == NULL)
-		return -EFAULT;
-
-	platecenter->plate = &plate;
-
-	platecenter->plaCenter->cx = &platecenter->plate->x0;
-	platecenter->plaCenter->cy = &platecenter->plate->y0;
-
-	platecenter->cent_buf = circ_cent_buf;
-
-	platecenter->active = TRUE;
-
-	plate_cent_data_to_panel(platecenter);
-
-	return ret;
-}
 
 int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
