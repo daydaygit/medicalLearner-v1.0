@@ -527,6 +527,11 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 		(clkPlate->dots_pos+i)->y = y;
 	}
 
+	//plate.dots_pos[i].x = '\0';	/*返回i就知道数据有多少个，这里可以不用也可以*/
+	//plate.dots_pos[i].y = '\0';
+
+	clkPlate->arc_bufsize = i;
+
 	return ret;
 }
 
