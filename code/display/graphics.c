@@ -37,12 +37,40 @@ struct timer_digital   digTimer;
 struct dot_pos  sec_dotspos_buf[26] = {0};
 struct dot_pos minu_dotspos_buf[23] = {0};
 struct dot_pos hour_dotspos_buf[20] = {0};
+
 #if ENABLE_DYNAMIC_TIME
 volatile unsigned int dateTime[6] = {2018, 4, 1, 0, 4, 47};
 volatile char update_panel_enable = 0;
 
 int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type);
 #endif
+
+/*const */ static struct dot_pos eighth_arc_dots_r30[] = {
+			{  0, 30 },
+			{  1, 30 },
+			{  2, 30 },
+			{  3, 30 },
+			{  4, 30 },
+			{  5, 30 },
+			{  6, 30 },
+			{  7, 29 },
+			{  8, 29 },
+			{  9, 29 },
+			{ 10, 28 },
+			{ 11, 28 },
+			{ 12, 28 },
+			{ 13, 27 },
+			{ 14, 27 },
+			{ 15, 26 },
+			{ 16, 26 },
+			{ 17, 25 },
+			{ 18, 24 },
+			{ 19, 24 },
+			{ 20, 23 },
+			{ 21, 22 },
+			{ 22, 21 },
+};
+
 /*const */ struct dot_pos endpoint_r30_on_plate[ENDPOINT_FOR_R30] = {
 #if 1
 			{  0, 30 },
@@ -541,76 +569,12 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 #else
 	/* directly calculate to get the coordinate values by PC */
 
-	(clkPlate->dots_pos+0)->x = 0;
-	(clkPlate->dots_pos+0)->y = 30;
+	for(i=0; i<sizeof(eighth_arc_dots_r30); i++) {
+		(clkPlate->dots_pos + i)->x = eighth_arc_dots_r30[i].x;
+		(clkPlate->dots_pos + i)->y = eighth_arc_dots_r30[i].y;
+	}
 
-	(clkPlate->dots_pos+1)->x = 1;
-	(clkPlate->dots_pos+1)->y = 30;
-
-	(clkPlate->dots_pos+2)->x = 2;
-	(clkPlate->dots_pos+2)->y = 30;
-
-	(clkPlate->dots_pos+3)->x = 3;
-	(clkPlate->dots_pos+3)->y = 30;
-
-	(clkPlate->dots_pos+4)->x = 4;
-	(clkPlate->dots_pos+4)->y = 30;
-
-	(clkPlate->dots_pos+5)->x = 5;
-	(clkPlate->dots_pos+5)->y = 30;
-
-	(clkPlate->dots_pos+6)->x = 6;
-	(clkPlate->dots_pos+6)->y = 30;
-
-	(clkPlate->dots_pos+7)->x = 7;
-	(clkPlate->dots_pos+7)->y = 29;
-
-	(clkPlate->dots_pos+8)->x = 8;
-	(clkPlate->dots_pos+8)->y = 29;
-
-	(clkPlate->dots_pos+9)->x = 9;
-	(clkPlate->dots_pos+9)->y = 29;
-
-	(clkPlate->dots_pos+10)->x = 10;
-	(clkPlate->dots_pos+10)->y = 28;
-
-	(clkPlate->dots_pos+11)->x = 11;
-	(clkPlate->dots_pos+11)->y = 28;
-
-	(clkPlate->dots_pos+12)->x = 12;
-	(clkPlate->dots_pos+12)->y = 28;
-
-	(clkPlate->dots_pos+13)->x = 13;
-	(clkPlate->dots_pos+13)->y = 27;
-
-	(clkPlate->dots_pos+14)->x = 14;
-	(clkPlate->dots_pos+14)->y = 27;
-
-	(clkPlate->dots_pos+15)->x = 15;
-	(clkPlate->dots_pos+15)->y = 26;
-
-	(clkPlate->dots_pos+16)->x = 16;
-	(clkPlate->dots_pos+16)->y = 26;
-
-	(clkPlate->dots_pos+17)->x = 17;
-	(clkPlate->dots_pos+17)->y = 25;
-
-	(clkPlate->dots_pos+18)->x = 18;
-	(clkPlate->dots_pos+18)->y = 24;
-
-	(clkPlate->dots_pos+19)->x = 19;
-	(clkPlate->dots_pos+19)->y = 24;
-
-	(clkPlate->dots_pos+20)->x = 20;
-	(clkPlate->dots_pos+20)->y = 23;
-
-	(clkPlate->dots_pos+21)->x = 21;
-	(clkPlate->dots_pos+21)->y = 22;
-
-	(clkPlate->dots_pos+22)->x = 22;
-	(clkPlate->dots_pos+22)->y = 21;
-
-	return i;
+	return i--;
 #endif
 
 }
