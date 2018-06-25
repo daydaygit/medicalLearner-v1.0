@@ -515,7 +515,8 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 
 	while(x<y) {
 		++i;
-		if(++i > CLK_PLATE_8thARC_SIZE)
+		if(i > CLK_PLATE_8thARC_SIZE)
+		//if(++i > CLK_PLATE_8thARC_SIZE)
 			return -EFAULT;
 
 		if(d < 0) {
