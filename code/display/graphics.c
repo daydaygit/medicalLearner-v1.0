@@ -503,6 +503,7 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 	if((clkPlate == NULL) || (clkPlate->dots_pos == NULL))
 		return -EFAULT;
 
+#if 0
 	x = 0;
 	y = clkPlate->r;
 	d = 3 - 2 * clkPlate->r;
@@ -537,6 +538,81 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 	clkPlate->arc_bufsize = i;
 
 	return ret;
+#else
+	/* directly calculate to get the coordinate values by PC */
+
+	(clkPlate->dots_pos+0)->x = 0;
+	(clkPlate->dots_pos+0)->y = 30;
+
+	(clkPlate->dots_pos+1)->x = 1;
+	(clkPlate->dots_pos+1)->y = 30;
+
+	(clkPlate->dots_pos+2)->x = 2;
+	(clkPlate->dots_pos+2)->y = 30;
+
+	(clkPlate->dots_pos+3)->x = 3;
+	(clkPlate->dots_pos+3)->y = 30;
+
+	(clkPlate->dots_pos+4)->x = 4;
+	(clkPlate->dots_pos+4)->y = 30;
+
+	(clkPlate->dots_pos+5)->x = 5;
+	(clkPlate->dots_pos+5)->y = 30;
+
+	(clkPlate->dots_pos+6)->x = 6;
+	(clkPlate->dots_pos+6)->y = 30;
+
+	(clkPlate->dots_pos+7)->x = 7;
+	(clkPlate->dots_pos+7)->y = 29;
+
+	(clkPlate->dots_pos+8)->x = 8;
+	(clkPlate->dots_pos+8)->y = 29;
+
+	(clkPlate->dots_pos+9)->x = 9;
+	(clkPlate->dots_pos+9)->y = 29;
+
+	(clkPlate->dots_pos+10)->x = 10;
+	(clkPlate->dots_pos+10)->y = 28;
+
+	(clkPlate->dots_pos+11)->x = 11;
+	(clkPlate->dots_pos+11)->y = 28;
+
+	(clkPlate->dots_pos+12)->x = 12;
+	(clkPlate->dots_pos+12)->y = 28;
+
+	(clkPlate->dots_pos+13)->x = 13;
+	(clkPlate->dots_pos+13)->y = 27;
+
+	(clkPlate->dots_pos+14)->x = 14;
+	(clkPlate->dots_pos+14)->y = 27;
+
+	(clkPlate->dots_pos+15)->x = 15;
+	(clkPlate->dots_pos+15)->y = 26;
+
+	(clkPlate->dots_pos+16)->x = 16;
+	(clkPlate->dots_pos+16)->y = 26;
+
+	(clkPlate->dots_pos+17)->x = 17;
+	(clkPlate->dots_pos+17)->y = 25;
+
+	(clkPlate->dots_pos+18)->x = 18;
+	(clkPlate->dots_pos+18)->y = 24;
+
+	(clkPlate->dots_pos+19)->x = 19;
+	(clkPlate->dots_pos+19)->y = 24;
+
+	(clkPlate->dots_pos+20)->x = 20;
+	(clkPlate->dots_pos+20)->y = 23;
+
+	(clkPlate->dots_pos+21)->x = 21;
+	(clkPlate->dots_pos+21)->y = 22;
+
+	(clkPlate->dots_pos+22)->x = 22;
+	(clkPlate->dots_pos+22)->y = 21;
+
+	return i;
+#endif
+
 }
 
 int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
