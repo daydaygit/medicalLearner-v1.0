@@ -468,6 +468,40 @@ int panel_data_init(struct clk_panel_prop *clkPanel)
 }
 
 
+int line_get_endpoint_base_linetable_and_arcdate(u8 r, int angle, struct dot_pos *endpoint, enum LINE_TYPE type)
+{
+	int size = 0, ret = 0;
+
+	/*1.默认已知原点坐标(0,0) 
+	 *2.依据给定x& angle,通过查表法找到y轴的值
+	 *3.将值和plate_dotsPos_buf[]中数据进行对比,找到最接近的那个坐标
+	 *4.最后返回的值(x,y)是plate_dotsPos_buf[]中的数据
+	 */
+
+	/*0/3/6/9/12刻度要用到这个*/
+
+	/*但angle_xy_r26_tab[]只要知道x&angle就能知道y值!!!*/
+	/*还是用上面的吧,这样出来的可能指向不到0/3/6/9刻度这些点上去*/
+	/*但是,如果外面圆由于使用的算法导致画出来的不标准，难道直线也要不标准下去吗? */
+
+	/*画圆用bresenham算法,画直线关键是要知道终点,终点通过查表法得到的靠谱吗*/
+	/*还是保持一致性,即用bresenmham算法得到终点x,y坐标*/
+
+	/*终点还是觉得用x^2+y^2=r^2 & y=kx 来求,而不是另一套通过excel得到的angle_xy_r26_tab[]来求
+	 *得到x=±[(r^2/(1+K^2))^(1/2)], y=kx */
+
+	/*结合excel表计算出直线和圆相交点的具体坐标组,y=kx, x是r/k的函数,r定下后就只有k变,依据角度变导致k变可以得到数据组
+	 *而bersenham 画圆算法可通过计算机直接得到xy的值，
+	 *通过excel画图，注意要标准的正方形，而不是肉眼看到的正方形，可结合bersionham画的圆经矫正后得到6倍角的坐标*/
+
+	/*体现在struct dot_pos endpoint_r30_on_plate[16]*/
+
+	endpoint = endpoint_r30_on_plate;
+	size = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);
+
+	return size;
+}
+
 int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
 	int i, j, k, sz, cnt;
@@ -481,15 +515,15 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	 * 而12个刻度完全可以绑定到圆环上；
 	 * 而每秒的时分秒针是要变的*/
 
-	sz=sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);
-	/* 依据endpoint_r30_on_plate[]中16个终点和原点(0,0)生成第1象限中scale数据*/	
+//	sz = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);  /* 依据endpoint_r30_on_plate[]中16个终点和原点(0,0)生成第1象限中scale数据*/
+	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL); /* size和其他变量一样，也丢到一个函数中处理 */
 
 	return ret;
 }
 
 /* bresenham_algorithm_create_arc_dots()记录相对于原点(0,0)的arc dots坐标
  * 返回存放坐标的数组指针
- * 后面函数通过坐标转换,将这些dots覆盖到panel数据中
+ * 后面函数通过坐标转??,将这些dots覆盖到panel数据中
 */
 int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 {
@@ -632,7 +666,7 @@ int plate_data_init(struct clk_plate_prop *clkPlate)
 	clkPlate->dots_pos   = plate_dotsPos_buf;
 	clkPlate->arc_bufsize = sizeof(plate_dotsPos_buf);	/* default size */
 
-	clkPlate->endpoint    = endpoint_r30_on_plate;
+	clkPlate->endpoint   = endpoint_r30_on_plate;
 
 	size = bresenham_algorithm_create_arc_dots(clkPlate);
 	if(! size) {
