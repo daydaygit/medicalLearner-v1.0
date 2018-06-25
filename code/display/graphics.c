@@ -490,9 +490,42 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	return ret;
 }
 
+/* bresenham_algorithm_create_arc_dots()记录相对于原点(0,0)的arc dots坐标
+ * 返回存放坐标的数组指针
+ * 后面函数通过坐标转换,将这些dots覆盖到panel数据中
+*/
 int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 {
+	u8 i = 0;
+	int d;
 	int ret = 0;
+
+	if((clkPlate == NULL) || (clkPlate->dots_pos == NULL))
+		return -EFAULT;
+
+	x = 0;
+	y = clkPlate->r;
+	d = 3 - 2 * clkPlate->r;
+
+	clkPlate->dots_pos[0]->x = x;
+	clkPlate->dots_pos[0]->y = y;
+
+	while(x<y) {
+		++i;
+		if(++i > CLK_PLATE_8thARC_SIZE)
+			return -EFAULT;
+
+		if(d < 0) {
+			d = d + 4 * x + 3;
+		} else {
+			d = d + 4 * (x - y) + 10;	//离P2近, 下一个点Y值减1
+			y--;
+		}
+		x++;
+
+		(clkPlate->dots_pos+i)->x = x;
+		(clkPlate->dots_pos+i)->y = y;
+	}
 
 	return ret;
 }
