@@ -499,7 +499,7 @@ int bresenham_algorithm_create_line_dots(struct clk_panel_prop *clkPanel,struct 
 	} else {
 		e = 2 * dx - dy;
 
-		for(i=0; i<=dy; i++) {
+		for(i=0; i<dy; i++)			// for(i=0; i<=dy; i++)
 
 			(*(buf + i)).x = x;
 			(*(buf + i)).y = y;
