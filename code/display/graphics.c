@@ -542,60 +542,60 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	  case LINE_SECOND:
 	  case LINE_MINUTE:
 	  case LINE_HOUR:
-		  if(type == LINE_SECOND) {
-			  time = *clkPanel->secHand->time;
-			  handDiff = 10;                        // 4
-			  m = time / 15;                        /* 15 dots in each quadrant */
+		if(type == LINE_SECOND) {
+			time = *clkPanel->secHand->time;
+			handDiff = 10;                        // 4
+			m = time / 15;                        /* 15 dots in each quadrant */
 
-			  if(clkPanel->secHand->handLen > sz)   {  clkPanel->secHand->handLen = sz;  }
+			if(clkPanel->secHand->handLen > sz)   {  clkPanel->secHand->handLen = sz;  }
 
-			  dotPos_l  = clkPanel->secHand->dots_pos;
-			  bufLen    = clkPanel->secHand->dotPos_buf_size;
-			  last_quad = &(clkPanel->secHand->last_quadrant);
+			dotPos_l  = clkPanel->secHand->dots_pos;
+			bufLen    = clkPanel->secHand->dotPos_buf_size;
+			last_quad = &(clkPanel->secHand->last_quadrant);
 
-		  } else if(type == LINE_MINUTE) {
-			  time = *clkPanel->minuHand->time;
+		} else if(type == LINE_MINUTE) {
+			time = *clkPanel->minuHand->time;
 
-			  if((i == 6) || (i == 7) || (i == 8))  {  handDiff = 4+2;  }
-			  else                                  {  handDiff = 4+3;  }
+			if((i == 6) || (i == 7) || (i == 8))  {  handDiff = 4+2;  }
+			else                                  {  handDiff = 4+3;  }
 
-			  m = time / 15;                        /* 15 dots in each quadrant */
+			m = time / 15;                        /* 15 dots in each quadrant */
 
-			  if(clkPanel->minuHand->handLen > sz)  {  clkPanel->minuHand->handLen = sz;  }
+			if(clkPanel->minuHand->handLen > sz)  {  clkPanel->minuHand->handLen = sz;  }
 
-			  dotPos_l  = clkPanel->minuHand->dots_pos;
-			  bufLen    = clkPanel->minuHand->dotPos_buf_size;
-			  last_quad = &(clkPanel->minuHand->last_quadrant);
+			dotPos_l  = clkPanel->minuHand->dots_pos;
+			bufLen    = clkPanel->minuHand->dotPos_buf_size;
+			last_quad = &(clkPanel->minuHand->last_quadrant);
 
-		  } else if(type == LINE_HOUR) {
-			  time = *clkPanel->hourHand->time;
-			  time *= 5;                            /* 1 hour jump 5 scale */
+		} else if(type == LINE_HOUR) {
+			time = *clkPanel->hourHand->time;
+			time *= 5;                            /* 1 hour jump 5 scale */
 
-			  if((i == 6) || (i == 7) || (i == 8))  {  handDiff = 4+3+2;  }
-			  else                                  {  handDiff = 4+3+3;  }
+			if((i == 6) || (i == 7) || (i == 8))  {  handDiff = 4+3+2;  }
+			else                                  {  handDiff = 4+3+3;  }
 
-			  m = time / 15;
+			m = time / 15;
 
-			  if(clkPanel->hourHand->handLen > sz)  {  clkPanel->hourHand->handLen = sz;  }
+			if(clkPanel->hourHand->handLen > sz)  {  clkPanel->hourHand->handLen = sz;  }
 
-			  dotPos_l  = clkPanel->hourHand->dots_pos;
-			  bufLen    = clkPanel->hourHand->dotPos_buf_size;
-			  last_quad = &(clkPanel->hourHand->last_quadrant);
-		  }
+			dotPos_l  = clkPanel->hourHand->dots_pos;
+			bufLen    = clkPanel->hourHand->dotPos_buf_size;
+			last_quad = &(clkPanel->hourHand->last_quadrant);
+		}
 
-		  switch(m) {
-			  case 0:  *last_quad = 1;  n = time % 15;       break;   /* period is 15 */
-			  case 1:  *last_quad = 4;  n = 15 - time % 15;  break;
-			  case 2:  *last_quad = 3;  n = time % 15;       break;
-			  case 3:  *last_quad = 2;  n = 15 - time % 15;  break;
-		  }
+		switch(m) {
+			case 0:  *last_quad = 1;  n = time % 15;       break;   /* period is 15 */
+			case 1:  *last_quad = 4;  n = 15 - time % 15;  break;
+			case 2:  *last_quad = 3;  n = time % 15;       break;
+			case 3:  *last_quad = 2;  n = 15 - time % 15;  break;
+		}
 
-		  cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (endpoint_r30+n)->x, (endpoint_r30+n)->y);
+		cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (endpoint_r30+n)->x, (endpoint_r30+n)->y);
 
-		  len = (bufLen < cnt) ? bufLen : cnt;
+		len = (bufLen < cnt) ? bufLen : cnt;
 
-		  /* Ìî³äÊ±·ÖÃëÕëdots_pos_buf */
-		  for(j=0; j < bufLen; j++) {
+		/* Ìî³äÊ±·ÖÃëÕëdots_pos_buf */
+		for(j=0; j < bufLen; j++) {
 			if( ( (*(buf + j)).x != '\0') || (*(buf + j)).y != '\0') {
 				(*(dotPos_l + j)).x = (*(buf + j)).x;
 				(*(dotPos_l + j)).y = (*(buf + j)).y;
@@ -604,8 +604,9 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 				(*(dotPos_l + j)).y = '\0';
 				break;
 			}
-		  }
-		  break;
+		}
+
+		break;
 	}
 
 	return ret;
