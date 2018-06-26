@@ -603,6 +603,37 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 			(*(dotPos_l + j)).y = (*(buf + j)).y;
 		}
 
+		for(j=0,k=0; j<cnt-handDiff; j++,k++) {  // 将总长度cnt-末尾4个点即可，而不是定死为从0开始的26个。Bresenham算法直线点数是不定的
+			//(*(*(clkscale->scaleBuf + 0) + k)).x = (*(buf + j)).x;	/*使用数组指针指向的数组0，不使用其他数组1/2/3是可以的*/
+			//(*(*(clkscale->scaleBuf + 0) + k)).x = (*(buf + j)).y;
+			switch(*last_quad) {
+			  case 1:		/*第1 象限*/
+				m = *(clkPanel->panCenter->cx) + buf[j].x;
+				n  = *(clkPanel->panCenter->cy) - buf[j].y;
+
+				ret = set_panel_dot(clkPanel, m, n);
+				break;
+			  case 4:		/*第4 象限*/
+				m = *(clkPanel->panCenter->cx) + buf[j].x;
+				n = *(clkPanel->panCenter->cy) + buf[j].y;
+
+				ret = set_panel_dot(clkPanel, m, n);
+				break;
+			  case 3:		/*第3 象限*/
+				m = *(clkPanel->panCenter->cx) - buf[j].x;
+				n = *(clkPanel->panCenter->cy) + buf[j].y;
+
+				ret = set_panel_dot(clkPanel, m, n);
+				break;
+			  case 2:		/*第2 象限*/
+				m = *(clkPanel->panCenter->cx) - buf[j].x;
+				n = *(clkPanel->panCenter->cy) - buf[j].y;
+
+				ret = set_panel_dot(clkPanel, m, n);
+				break;
+			}
+		}
+
 		break;
 	}
 
