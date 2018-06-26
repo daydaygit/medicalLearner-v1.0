@@ -595,9 +595,10 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 		len = (bufLen < cnt) ? bufLen : cnt;
 
 		/* Ìî³äÊ±·ÖÃëÕëdots_pos_buf */
-//		for(j=0; j < bufLen; j++) {
-//		for(j=0; j < cnt;    j++) {
-		for(j=0; j < len; j++) {
+//		for(j=0; j < bufLen;       j++) {
+//		for(j=0; j < cnt;          j++) {
+//		for(j=0; j < len;          j++) {
+		for(j=0; j < cnt-handDiff; j++) {
 			(*(dotPos_l + j)).x = (*(buf + j)).x;
 			(*(dotPos_l + j)).y = (*(buf + j)).y;
 		}
