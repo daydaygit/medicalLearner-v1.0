@@ -467,6 +467,12 @@ int panel_data_init(struct clk_panel_prop *clkPanel)
 	return ret;
 }
 
+int bresenham_algorithm_create_line_dots(struct clk_panel_prop *clkPanel,struct dot_pos *buf, u8 x0, u8 y0, u8 x1, u8 y1)
+{
+	int ret = 0;
+
+	return ret;
+}
 
 //int line_get_endpoint_base_linetable_and_arcdate(u8 r, int angle, struct dot_pos *endpoint, enum LINE_TYPE type)
 int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint, enum LINE_TYPE type)
@@ -512,15 +518,81 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	int t;
 	int handDiff;
 
+	struct dot_pos *buf = NULL;                     /*临时存放bresenham算法得到的值*/
+
+	int bufLen = 0, len = 0;
+	struct dot_pos *dotPos_l = NULL;
+	struct dot_pos *endpoint_r30 = NULL;
+
+	unsigned int time/*, htime*/;
+	char quadrant, *last_quad = NULL;
+
 	/* 圆环和12个刻度是固定不变的,可以用1/8 part来表示；
-	 * 圆环不可能上面所有坐标都放到内存里,因为如果r很大需要很多数据；
+	 * 圆环不可能上面所有坐标都放到内存里,因为如果r很大?枰芏嗍荩?
 	 * 而12个刻度完全可以绑定到圆环上；
 	 * 而每秒的时分秒针是要变的*/
 
 //	sz = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);  /* 依据endpoint_r30_on_plate[]中16个终点和原点(0,0)生成第1象限中scale数据*/
-//	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL); /* size和其他变量一样，也丢?揭桓龊写? */
+//	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL); /* size和其他变量一样，也丢到一个函数中处理 */
 //	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, endpoint_r30, LINE_ALL);
 	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, &endpoint_r30, LINE_ALL);
+
+	switch(type) {
+	  case LINE_SECOND:
+	  case LINE_MINUTE:
+	  case LINE_HOUR:
+		  if(type == LINE_SECOND) {
+			  time = *clkPanel->secHand->time;
+			  handDiff = 10;                        // 4
+			  m = time / 15;                        /* 15 dots in each quadrant */
+
+			  if(clkPanel->secHand->handLen > sz)   {  clkPanel->secHand->handLen = sz;  }
+
+			  dotPos_l  = clkPanel->secHand->dots_pos;
+			  bufLen    = clkPanel->secHand->dotPos_buf_size;
+			  last_quad = &(clkPanel->secHand->last_quadrant);
+
+		  } else if(type == LINE_MINUTE) {
+			  time = *clkPanel->minuHand->time;
+
+			  if((i == 6) || (i == 7) || (i == 8))  {  handDiff = 4+2;  }
+			  else                                  {  handDiff = 4+3;  }
+
+			  m = time / 15;                        /* 15 dots in each quadrant */
+
+			  if(clkPanel->minuHand->handLen > sz)  {  clkPanel->minuHand->handLen = sz;  }
+
+			  dotPos_l  = clkPanel->minuHand->dots_pos;
+			  bufLen    = clkPanel->minuHand->dotPos_buf_size;
+			  last_quad = &(clkPanel->minuHand->last_quadrant);
+
+		  } else if(type == LINE_HOUR) {
+			  time = *clkPanel->hourHand->time;
+			  time *= 5;                            /* 1 hour jump 5 scale */
+
+			  if((i == 6) || (i == 7) || (i == 8))  {  handDiff = 4+3+2;  }
+			  else                                  {  handDiff = 4+3+3;  }
+
+			  m = time / 15;
+
+			  if(clkPanel->hourHand->handLen > sz)  {  clkPanel->hourHand->handLen = sz;  }
+
+			  dotPos_l  = clkPanel->hourHand->dots_pos;
+			  bufLen    = clkPanel->hourHand->dotPos_buf_size;
+			  last_quad = &(clkPanel->hourHand->last_quadrant);
+		  }
+
+		  switch(m) {
+			  case 0:  *last_quad = 1;  n = time % 15;       break;   /* period is 15 */
+			  case 1:  *last_quad = 4;  n = 15 - time % 15;  break;
+			  case 2:  *last_quad = 3;  n = time % 15;       break;
+			  case 3:  *last_quad = 2;  n = 15 - time % 15;  break;
+		  }
+
+		  cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (endpoint_r30+n)->x, (endpoint_r30+n)->y);
+
+		  break;
+	}
 
 	return ret;
 }
