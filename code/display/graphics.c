@@ -748,54 +748,6 @@ int bresenham_algorithm_create_arc_dots(struct clk_plate_prop *clkPlate)
 
 	return i--;
 #endif
-
-}
-
-int bresenham_circle_plate(struct clk_plate_prop *clkPlate)
-{
-	u8 x,y,i = 0;
-	int d;
-	char ret = 0;
-
-	x = 0;
-	y = clkPlate->r;
-	d = 3 - 2 * clkPlate->r;
-
-	//clkPlate->dots_pos[0]->x = x;
-	//clkPlate->dots_pos[0]->y = y;
-
-	clkPlate->dots_pos->x = x;
-	clkPlate->dots_pos->y = y;
-
-	//draw_dots_arc_x8(x0, y0, x, y, r);
-
-	while(x<y) {
-		if(++i > CLK_PLATE_8thARC_SIZE)
-			return -EFAULT;
-
-		if(d < 0) {
-			d = d + 4 * x + 3;
-		} else {
-			d = d + 4 * (x - y) + 10;	//离P2近, 下一个点Y值减1
-			y--;
-		}
-		x++;
-
-		//plate.dots_pos[i]->x = x;
-		//plate.dots_pos[i]->y = y;
-
-		(plate.dots_pos + i)->x = x;
-		(plate.dots_pos + i)->y = y;
-
-		//draw_dots_arc_x8(x0, y0, x, y, r);
-	}
-
-	//plate.dots_pos[i].x = '\0';
-	//plate.dots_pos[i].y = '\0';
-
-	clkPlate->arc_bufsize = i;
-
-	return ret;
 }
 
 int plate_data_init(struct clk_plate_prop *clkPlate)
