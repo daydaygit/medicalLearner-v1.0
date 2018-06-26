@@ -529,12 +529,12 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	char quadrant, *last_quad = NULL;
 
 	/* 圆环和12个刻度是固定不变的,可以用1/8 part来表示；
-	 * 圆环不可能上面所有坐标都放到内存里,因为如果r很大?枰芏嗍荩?
+	 * 圆环不可能上面所有坐标都放到内存里,?蛭绻鹯很大?枰芏嗍荩?
 	 * 而12个刻度完全可以绑定到圆环上；
 	 * 而每秒的时分秒针是要变的*/
 
 //	sz = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);  /* 依据endpoint_r30_on_plate[]中16个终点和原点(0,0)生成第1象限中scale数据*/
-//	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL); /* size和其他变量一样，也丢到一个函数中处理 */
+//	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, clkscale->angle, endpoint_r30, LINE_ALL);/* size和其他变量一样也丢到一个函数处理 */
 //	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, endpoint_r30, LINE_ALL);
 	sz = line_get_endpoint_base_linetable_and_arcdate(clkPanel->plate->r, &endpoint_r30, LINE_ALL);
 
@@ -592,6 +592,19 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 
 		  cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (endpoint_r30+n)->x, (endpoint_r30+n)->y);
 
+		  len = (bufLen < cnt) ? bufLen : cnt;
+
+		  /* 填充时分秒针dots_pos_buf */
+		  for(j=0; j < bufLen; j++) {
+			if( ( (*(buf + j)).x != '\0') || (*(buf + j)).y != '\0') {
+				(*(dotPos_l + j)).x = (*(buf + j)).x;
+				(*(dotPos_l + j)).y = (*(buf + j)).y;
+			} else {
+				(*(dotPos_l + j)).x = '\0';
+				(*(dotPos_l + j)).y = '\0';
+				break;
+			}
+		  }
 		  break;
 	}
 
