@@ -596,7 +596,8 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 
 		/* ÃÓ≥‰ ±∑÷√Î’Îdots_pos_buf */
 //		for(j=0; j < bufLen; j++) {
-		for(j=0; j < cnt; j++) {
+//		for(j=0; j < cnt;    j++) {
+		for(j=0; j < len; j++) {
 			(*(dotPos_l + j)).x = (*(buf + j)).x;
 			(*(dotPos_l + j)).y = (*(buf + j)).y;
 		}
