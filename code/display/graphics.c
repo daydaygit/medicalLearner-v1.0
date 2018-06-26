@@ -608,26 +608,29 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 			//(*(*(clkscale->scaleBuf + 0) + k)).x = (*(buf + j)).y;
 			switch(*last_quad) {
 			  case 1:		/*第1 象限*/
-				m = *(clkPanel->panCenter->cx) + buf[j].x;
-				n  = *(clkPanel->panCenter->cy) - buf[j].y;
+//				m = *(clkPanel->panCenter->cx) + buf[j].x;
+//				n  = *(clkPanel->panCenter->cy) - buf[j].y;
+
+				m = *(clkPanel->panCenter->cx) + (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) - (*(buf + j)).y;
 
 				ret = set_panel_dot(clkPanel, m, n);
 				break;
 			  case 4:		/*第4 象限*/
-				m = *(clkPanel->panCenter->cx) + buf[j].x;
-				n = *(clkPanel->panCenter->cy) + buf[j].y;
+				m = *(clkPanel->panCenter->cx) + (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) + (*(buf + j)).y;
 
 				ret = set_panel_dot(clkPanel, m, n);
 				break;
 			  case 3:		/*第3 象限*/
-				m = *(clkPanel->panCenter->cx) - buf[j].x;
-				n = *(clkPanel->panCenter->cy) + buf[j].y;
+				m = *(clkPanel->panCenter->cx) - (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) + (*(buf + j)).y;
 
 				ret = set_panel_dot(clkPanel, m, n);
 				break;
 			  case 2:		/*第2 象限*/
-				m = *(clkPanel->panCenter->cx) - buf[j].x;
-				n = *(clkPanel->panCenter->cy) - buf[j].y;
+				m = *(clkPanel->panCenter->cx) - (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) - (*(buf + j)).y;
 
 				ret = set_panel_dot(clkPanel, m, n);
 				break;
