@@ -469,9 +469,56 @@ int panel_data_init(struct clk_panel_prop *clkPanel)
 
 int bresenham_algorithm_create_line_dots(struct clk_panel_prop *clkPanel,struct dot_pos *buf, u8 x0, u8 y0, u8 x1, u8 y1)
 {
-	int ret = 0;
+	int dx = ABS(x1 - x0);
+	int dy = ABS(y1 - y0);
+	int  x = x0;
+	int  y = y0;
+	int e=0, i=0;
+	int stepX, stepY;
 
-	return ret;
+	stepX = (x0 > x1) ? -1 : 1;			// x0 > x1时是从右向左画
+	stepY = (y0 > y1) ? -1 : 1;			// y0 > y1时是从上向下画
+
+	if(dx > dy)  					// 沿着最长的那个轴前进
+	{
+		e = dy * 2 - dx;
+
+		for(i=0; i<dx; i++) {			// for(i=0; i<=dx; i++)
+
+			(*(buf + i)).x = x;		// should be ->  ??????
+			(*(buf + i)).y = y;
+
+			x += stepX;
+			e += dy;
+
+			if(e >= 0) {
+				y += stepY;
+				e -= dx;
+			}
+		}
+	} else {
+		e = 2 * dx - dy;
+
+		for(i=0; i<=dy; i++) {
+
+			(*(buf + i)).x = x;
+			(*(buf + i)).y = y;
+
+			y += stepY;
+			e += dx;
+
+			if(e >= 0) {
+				x += stepX;
+				e -= dy;
+			}
+		}
+	}
+#if 0
+	(*(buf + i)).x = '\0';
+	(*(buf + i)).y = '\0';
+#endif
+
+	return i;
 }
 
 //int line_get_endpoint_base_linetable_and_arcdate(u8 r, int angle, struct dot_pos *endpoint, enum LINE_TYPE type)
