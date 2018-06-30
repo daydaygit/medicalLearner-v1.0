@@ -704,7 +704,8 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 			for(j = cnt - clkscale->len, k = 0; j < cnt; j++, k++) { /* 注意: sz-clkscale->len应该≤SCALE_LEN。scale初始化时已有clkscale->len=SCALE_LEN; */
 //				if(j == sz - clkscale->len) {
 				if(j == cnt - clkscale->len) {
-					if((clkscale->angle = 0) || (clkscale->angle = 30) || (clkscale->angle = 60) || (clkscale->angle = 90)) { // %30 求模为0
+//					if((clkscale->angle = 0) || (clkscale->angle = 30) || (clkscale->angle = 60) || (clkscale->angle = 90)) {     // %30 求模为0
+					if((clkscale->angle == 0) || (clkscale->angle == 30) || (clkscale->angle == 60) || (clkscale->angle == 90)) { // %30 求模为0
 						enable = 1;
 					} else {
 						/* 不记录该坐标，也就是为0 */
