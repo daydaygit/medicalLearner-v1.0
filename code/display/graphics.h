@@ -225,6 +225,14 @@ enum clkElement {
 	CLK_SECD_HAND,
 };
 
+enum timeType {
+	SECOND = 0,
+	MINUTE,
+	HOUR,
+	DAY,
+	MONTH,
+	YEAR,
+};
 
 enum LINE_TYPE {
 	LINE_NULL = 0,

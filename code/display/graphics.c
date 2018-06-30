@@ -405,22 +405,25 @@ int get_each_bit_num(struct timer_digital *dTime, char *buf, enum timeType type)
 	int ret = 0;
 
 	switch(type) {
-	  case YEAR:    time = *dTime->year;
-	                buf[3] =    time / 1000;
-		        buf[2] =   (time / 100) % 10;
-		        buf[1] =  ((time / 10)  % 100)  % 10;
-		        buf[0] = (((time / 1)   % 1000) % 100) % 10;
-		        break;
-	  case MONTH:   time = *dTime->month;
-	  case DAY:     time = *dTime->day;
-	  case HOUR:    time = *dTime->hour;
-	  case MINUTE:  time = *dTime->minute;
-	  case SECOND:  time = *dTime->second;
-	                buf[3] = buf [2] = 0;
-			buf[1] = time / 10;
-			buf[0] = time % 10;
-			break;
+		case SECOND:   time = *dTime->second;   break;
+		case MINUTE:   time = *dTime->minute;   break;
+		case HOUR:     time = *dTime->hour;     break;
+		case DAY:      time = *dTime->day;      break;
+		case MONTH:    time = *dTime->month;    break;
+		case YEAR:     time = *dTime->year;     break;
 	}
+
+	if(type == YEAR) {
+		buf[3] =	time / 1000;
+		buf[2] =   (time / 100) % 10;
+		buf[1] =  ((time / 10)	% 100)	% 10;
+		buf[0] = (((time / 1)	% 1000) % 100) % 10;
+	} else {
+		buf[3] = buf [2] = 0;
+		buf[1] = time / 10;
+		buf[0] = time % 10;
+	}
+
 	return ret;
 }
 int put_num_to_digTime_buf(char *dtBuf, char *buf, enum timeType type)
