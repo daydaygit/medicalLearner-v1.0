@@ -443,32 +443,9 @@ int digital_timer_data_init(struct timer_digital *digTime)
 		*(digital_time_buf + i) = 0;	/* clear time buf */
 
 	for(i=0; i<6; i++) {
-		switch(i) {
-		  case 0:
-			get_each_bit_num(digTime, tmbuf, YEAR);
-			put_num_to_digTime_buf(digital_time_buf, tmbuf, YEAR);
-			break;
-		  case 1:
-			get_each_bit_num(digTime, tmbuf, MONTH);
-			put_num_to_digTime_buf(digital_time_buf, tmbuf, MONTH);
-			break;
-		  case 2:
-			get_each_bit_num(digTime, tmbuf, DAY);
-			put_num_to_digTime_buf(digital_time_buf, tmbuf, DAY);
-			break;
-		  case 3:
-			get_each_bit_num(digTime, tmbuf, HOUR);
-			put_num_to_digTime_buf(digital_time_buf, tmbuf, HOUR);
-			break;
-		  case 4:
-			get_each_bit_num(digTime, tmbuf, MINUTE);
-			put_num_to_digTime_buf(digital_time_buf, tmbuf, MINUTE);
-			break;
-		  case 5:
-			get_each_bit_num(digTime, tmbuf, SECOND);
-			put_num_to_digTime_buf(digital_time_buf, tmbuf, SECOND);
-			break;
-		}
+		get_each_bit_num(digTime, tmbuf, (enum timeType )i);
+
+		put_num_to_digTime_buf(digital_time_buf, tmbuf, (enum timeType )i);
 	}
 
 	SET_LCD_PAGE_COLUMN(3, 68);
