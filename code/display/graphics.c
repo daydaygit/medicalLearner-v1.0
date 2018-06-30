@@ -1,6 +1,11 @@
 #include <stm32f10x.h>		// u8
 #include "graphics.h"
 
+#define SET_LCD_PAGE_COLUMN(PAGE, COL)                                 \
+			OLED_WR_Byte(0xb0+PAGE,            OLED_CMD);  \
+			OLED_WR_Byte(((COL&0xf0)>>4)|0x10, OLED_CMD);  \
+			OLED_WR_Byte((COL&0x0f)|0x01,      OLED_CMD);
+
 struct clk_panel_prop panel;
 //panel
 struct icon_center  pancenter;
@@ -30,6 +35,7 @@ struct clk_scale_prop  clkScale;
 
 struct timer_digital   digTimer;
 
+char digital_time_buf[DIGITAL_TIME_LEN] = {0};
 
 //struct dot_pos  sec_dotspos_buf[CLK_SHAND_LEN * CLK_SHAND_WID] = {0};
 //struct dot_pos minu_dotspos_buf[CLK_MHAND_LEN * CLK_MHAND_WID] = {0};
@@ -392,6 +398,97 @@ int cast_arc_dots_to_panel(struct clk_plate_prop *clkPlate, struct clk_panel_pro
 
 	return ret;
 }
+
+int put_num_to_digTime_buf(char *dtBuf, char *buf, enum timeType type)
+{
+	int ret = 0;
+
+	return ret;
+}
+
+int digital_timer_data_init(struct timer_digital *digTime)
+{
+	char i, j, tmbuf[4];	/* tmbuf: save each bit num for time as 2018.05.12 */
+	int ret = 0;
+	static char l1=1, l2=1;
+
+        /*
+           布局1: 2018年05月12日
+                    10:00:00
+           方式1:先打印"年月日"和":"文字
+                 再打印年月日数字
+                 再打印时分秒数字
+           细节1:文字"年月日"占12X16字体的12*3=36个点，还剩下最多128-64-36=28个点
+                 数字"年月日"共8个数字，28/8=3开来分摊不了。故还是不要文字
+
+           布局2：2018.05.12     ---在第3、4页打印
+                   10:00:00       ---在第5、6页打印
+           方式2：先打印字符'.'和':'
+                  再打印年月日数字
+                  再打印时分秒数字
+           细节2：字符、数字格式都是横向占6个点
+
+           优化： 既然都是横向占用6个点，而且都是字符，何不放到一个字符串数字中，打印的时候一顺打印出来，这样不就事件任务要简化了？一共18个字符
+                  这样看来要讲数字2018转成字符'2','0','1','8'
+                  2018 / 1000 = 2;  //要将需要的那个数是数字的尾部
+                  2018 / 100  = 20;   20   % 10   = 0
+                  2018 / 10   = 201;  155  % 100  = 55;  55  % 10  = 5
+                  2018 / 1    = 2018; 2018 % 1000 = 018; 018 % 100 = 18; 18 % 10 = 8
+
+                  05月12日、23:02:56  数字都小于100
+                  23 / 10 = 2;   23 % 10 = 3
+        */
+
+	for(i=0; i<DIGITAL_TIME_LEN; i++)
+		*(digital_time_buf + i) = 0;	/* clear time buf */
+
+	for(i=0; i<6; i++) {
+		switch(i) {
+		  case 0:
+			get_each_bit_num(digTime, tmbuf, YEAR);
+			put_num_to_digTime_buf(digital_time_buf, tmbuf, YEAR);
+			break;
+		  case 1:
+			get_each_bit_num(digTime, tmbuf, MONTH);
+			put_num_to_digTime_buf(digital_time_buf, tmbuf, MONTH);
+			break;
+		  case 2:
+			get_each_bit_num(digTime, tmbuf, DAY);
+			put_num_to_digTime_buf(digital_time_buf, tmbuf, DAY);
+			break;
+		  case 3:
+			get_each_bit_num(digTime, tmbuf, HOUR);
+			put_num_to_digTime_buf(digital_time_buf, tmbuf, HOUR);
+			break;
+		  case 4:
+			get_each_bit_num(digTime, tmbuf, MINUTE);
+			put_num_to_digTime_buf(digital_time_buf, tmbuf, MINUTE);
+			break;
+		  case 5:
+			get_each_bit_num(digTime, tmbuf, SECOND);
+			put_num_to_digTime_buf(digital_time_buf, tmbuf, SECOND);
+			break;
+		}
+	}
+
+	SET_LCD_PAGE_COLUMN(3, 68);
+	for(j=0; j<10; j++) {
+		for(i=0; i<6; i++) {
+			OLED_WR_Byte(*(ASCII6x8 + ((digital_time_buf[DIGITAL_TIME_LEN -1 - j] - 32) *6 ) + i), 1);  // 32:ASCII????ʾ????32??ʼ
+		}
+	}
+
+	//j=10 is '-', to be ignore
+	SET_LCD_PAGE_COLUMN(5, 74);
+	for(j=11; j<DIGITAL_TIME_LEN; j++) {
+		for(i=0; i<6; i++) {
+			OLED_WR_Byte(*(ASCII6x8 + ((digital_time_buf[DIGITAL_TIME_LEN -1 - j] - 32) *6 ) + i), 1);  // 32:ASCII????ʾ????32??ʼ
+		}
+	}
+
+	return ret;
+}
+
 int timer_digit_data_init(struct timer_digital *digTime)
 {
 	int ret =0;
@@ -1206,6 +1303,7 @@ char clk_panel_init(void)
 
 	second_hand_data_init(&secHand, &digTimer);
 
+	digital_timer_data_init(&digTimer);
 	return ret;
 }
 

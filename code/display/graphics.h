@@ -61,6 +61,7 @@ typedef enum {
 
 #define ENDPOINT_FOR_R30	     16
 
+#define DIGITAL_TIME_LEN             19
 
 //const char clk_plate_eighth_buf[CLK_PLATE_8thARC_SIZE +  CLK_POINTER_EXTRA] = {0};
 
