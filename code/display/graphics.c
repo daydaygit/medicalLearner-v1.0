@@ -426,9 +426,53 @@ int get_each_bit_num(struct timer_digital *dTime, char *buf, enum timeType type)
 
 	return ret;
 }
+
+char get_character_base_bitNum(char *cbit)
+{
+	char ch = '\0';
+
+	switch(*cbit) {
+	  case 0:	ch = '0';	break;
+	  case 1:	ch = '1';	break;
+	  case 2:	ch = '2';	break;
+	  case 3:	ch = '3';	break;
+	  case 4:	ch = '4';	break;
+	  case 5:	ch = '5';	break;
+	  case 6:	ch = '6';	break;
+	  case 7:	ch = '7';	break;
+	  case 8:	ch = '8';	break;
+	  case 9:	ch = '9';	break;
+	}
+
+	return ch;
+}
+
 int put_num_to_digTime_buf(char *dtBuf, char *buf, enum timeType type)
 {
+	char i, c, base, bits;
 	int ret = 0;
+
+        /*2018.05.11-23:02:56
+             |     |  |  |  |
+            15     9  6  3  0 */
+
+	switch(type) {
+	  case SECOND:  bits = 2;    base = 0;   break;
+	  case MINUTE:  bits = 2;    base = 3;   break;
+	  case HOUR:    bits = 2;    base = 6;   break;
+	  case DAY:     bits = 2;    base = 9;   break;
+	  case MONTH:   bits = 2;    base = 12;  break;
+	  case YEAR:    bits = 4;    base = 15;  break;
+	}
+
+	for(i=0; i<bits; i++) {
+		c = get_character_base_bitNum(buf + i);
+		*(dtBuf + base + i) = c;		/* error result from lose {} of for in digital_timer_data_init() */
+	}
+
+	*(dtBuf + 8)  = '-';
+	*(dtBuf + 5)  = *(dtBuf + 2)  = ':';
+	*(dtBuf + 14) = *(dtBuf + 11) = '.';
 
 	return ret;
 }
