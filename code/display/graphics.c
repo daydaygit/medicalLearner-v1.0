@@ -715,6 +715,34 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 				} else {
 					enable = 1;
 				}
+
+				/* 后来发现，其实没必要用数组指针，用一个数组装buf数据，打印完后，下次清除再装别的 */
+				if(enable == 1) {
+//					(*(*(clkscale->scaleBuf + i) + k)).x = (*(buf + k)).x;
+//					(*(*(clkscale->scaleBuf + i) + k)).y = (*(buf + k)).y;
+					(*(*(clkscale->scaleBuf + i) + k)).x = (*(buf + j)).x;
+					(*(*(clkscale->scaleBuf + i) + k)).y = (*(buf + j)).y;
+
+					/*第1 象限*/
+					m = *(clkPanel->panCenter->cx) + buf[j].x;  /* should use scaleBuf, not buf?????*/
+					n = *(clkPanel->panCenter->cy) - buf[j].y;
+					ret = set_panel_dot(clkPanel, m, n);
+
+					/*第4 象限*/
+					m = *(clkPanel->panCenter->cx) + buf[j].x;
+					n = *(clkPanel->panCenter->cy) + buf[j].y;
+					ret = set_panel_dot(clkPanel, m, n);
+
+					/*第2 象限*/
+					m = *(clkPanel->panCenter->cx) - buf[j].x;
+					n = *(clkPanel->panCenter->cy) - buf[j].y;
+					ret = set_panel_dot(clkPanel, m, n);
+
+					/*第3 象限*/
+					m = *(clkPanel->panCenter->cx) - buf[j].x;
+					n = *(clkPanel->panCenter->cy) + buf[j].y;
+					ret = set_panel_dot(clkPanel, m, n);
+				}
 			}
 
 			break;
