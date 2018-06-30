@@ -702,7 +702,12 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 ///			for(j = 0, k = 0; j < cnt; j++, k++) {
 ////			for(j = sz - clkscale->len, k = 0; j < cnt; j++, k++) {
 			for(j = cnt - clkscale->len, k = 0; j < cnt; j++, k++) { /* 注意: sz-clkscale->len应该≤SCALE_LEN。scale初始化时已有clkscale->len=SCALE_LEN; */
+//				if(j == sz - clkscale->len) {
+				if(j == cnt - clkscale->len) {
 
+				} else {
+					enable = 1;
+				}
 			}
 
 			break;
