@@ -693,7 +693,8 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 //			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, endpoint_r30[i].x, endpoint_r30[i].y);
 //			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (*(endpoint_r30+i)).x, (*(endpoint_r30+i)).y);
 //			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, endpoint_r30_on_plate[i].x, endpoint_r30_on_plate[i].y);
-			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, ((struct dot_pos *)(endpoint_r30+i))->x, ((struct dot_pos *)(endpoint_r30+i))->y);
+//			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, ((struct dot_pos *)(endpoint_r30+i))->x, ((struct dot_pos *)(endpoint_r30+i))->y);
+			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (endpoint_r30+i)->x, (endpoint_r30+i)->y);
 			break;
 		}
 	}
