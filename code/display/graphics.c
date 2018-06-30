@@ -695,6 +695,16 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 //			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, endpoint_r30_on_plate[i].x, endpoint_r30_on_plate[i].y);
 //			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, ((struct dot_pos *)(endpoint_r30+i))->x, ((struct dot_pos *)(endpoint_r30+i))->y);
 			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, (endpoint_r30+i)->x, (endpoint_r30+i)->y);
+
+//			for(j = sz - clkscale->len, k = 0; j <= sz; j++, k++) {
+//			for(j = sz - clkscale->len, k = 0; j < sz; j++, k++) {
+///			for(j = 0, k = 0; j < sz; j++, k++) {
+///			for(j = 0, k = 0; j < cnt; j++, k++) {
+////			for(j = sz - clkscale->len, k = 0; j < cnt; j++, k++) {
+			for(j = cnt - clkscale->len, k = 0; j < cnt; j++, k++) { /* 注意: sz-clkscale->len应该≤SCALE_LEN。scale初始化时已有clkscale->len=SCALE_LEN; */
+
+			}
+
 			break;
 		}
 	}
