@@ -685,6 +685,14 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 		}
 
 		break;
+	  case LINE_SCALE:
+		clkscale = clkPanel->plate->clkscale;
+		for(i=0; i<sz; i++) {
+			clkscale->angle = 6 * i;
+
+			cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, endpoint_r30[i].x, endpoint_r30[i].y);
+			break;
+		}
 	}
 
 	return ret;
