@@ -24,6 +24,10 @@
 //#define KEY_PPG                GPIO_Pin_8       //GPB8
 #define KEY_SPO2          GPIO_Pin_9    //GPB9
 
+#if ENABLE_DYNAMIC_TIME
+extern struct clk_panel_prop *get_panel_date(void);
+extern int clear_pan_old_data(struct clk_panel_prop *clkPanle, enum LINE_TYPE type);
+#endif
 
 __IO uint8_t Function_Select = 0;
 __IO uint8_t Max30102_INT_Flag = 0;
@@ -242,6 +246,25 @@ int update_dateTime(unsigned int *dtime)
 
 	return ret;
 }
+
+int clear_panel_old_data(void)
+{
+	struct clk_panel_prop *clkPanle = NULL;
+	int ret = 0;
+
+	clkPanle = get_panel_date();
+	if(clkPanle == NULL)
+		return -EINVAL;
+
+	ret = clear_pan_old_data(clkPanle, LINE_SECOND);
+	ret = clear_pan_old_data(clkPanle, LINE_MINUTE);
+	ret = clear_pan_old_data(clkPanle, LINE_HOUR);
+
+//	ret = clear_pan_old_data(clkPanle, LINE_SCALE);
+
+	return ret;
+}
+
 #endif
 
 /*****************************************************************************
@@ -258,6 +281,8 @@ void TIM2_IRQHandler(void)
 		cnt = 0;
 
 		update_dateTime(dateTime);
+
+		clear_panel_old_data();
 	}
 
 #endif

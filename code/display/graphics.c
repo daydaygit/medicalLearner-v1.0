@@ -265,6 +265,11 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type);
  #endif
 };
 
+struct clk_panel_prop *get_panel_date(void)
+{
+	return &panel;
+}
+
 int set_panel_dot(struct clk_panel_prop *clkPanel, u8 X, u8 Y)
 {
 	u8 ax, y1, y2;
@@ -700,6 +705,13 @@ int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint
 	size = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);
 
 	return size;
+}
+
+int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
+{
+	int ret = 0;
+
+	return ret;
 }
 
 int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
