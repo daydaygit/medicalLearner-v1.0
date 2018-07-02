@@ -163,15 +163,112 @@ void InitKeyPad()
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
+#if ENABLE_DYNAMIC_TIME
+unsigned int get_max_day_for_month(unsigned int *dtime)
+{
+	unsigned int day, month, year;
+
+	year  = *(dtime + 0);
+	month = *(dtime + 1);
+	if(month == 2) {
+		/*给出一个年月,计算闰月*/
+		/*闰月的定义:
+		  普通年（不能被100整除的年份）能被4整除的为闰年；
+		  世纪年（能被100整除的年份）能被400整除的是闰年
+		 */
+		if(((year % 4) == 0) && ((year % 100) != 0) || ((year % 400) == 0)) {
+			day = 29;
+		} else {
+			day = 28;
+		}
+	} else if((month == 1) || (month == 3)  || (month == 5) || (month == 7) ||\
+		  (month == 8) || (month == 10) || (month == 12)) {
+		day = 31;
+	} else {
+		day = 30;
+	}
+
+	return day;
+}
+
+int update_dateTime(unsigned int *dtime)
+{
+	unsigned int maxday = 0;
+	int ret = 0;
+
+	(*(dateTime+5))++;
+
+	if((*(dateTime+5)) < 60 ) {		// Second: 0~59
+		return ret;
+	} else {
+		(*(dateTime+5)) = 0;
+		(*(dateTime+4))++;
+	}
+
+	if((*(dateTime+4)) < 60) {		// minute: 0~59
+		return ret;
+	} else {
+		(*(dateTime+4)) = 0;
+		(*(dateTime+3))++;
+	}
+
+	if((*(dateTime+3)) < 24) {		// hour: 0~23
+		return ret;
+	} else {
+		(*(dateTime+3)) = 0;
+		(*(dateTime+2))++;
+	}
+
+	maxday = get_max_day_for_month(dtime);
+	if((*(dateTime+2)) < maxday+1) {	// day: 1~28/29/30/31
+		return ret;
+	} else {
+		(*(dateTime+2)) = 1;
+		(*(dateTime+1))++;
+	}
+
+	if((*(dateTime+1)) < 12) {		// month: 1~12
+		return ret;
+	} else {
+		(*(dateTime+1)) = 1;
+		(*(dateTime+0))++;
+	}
+
+	if((*(dateTime+0)) < 2068) {		//year
+		return ret;
+	} else {
+		(*(dateTime+0)) = 2018;
+	}
+
+	return ret;
+}
+#endif
+
 /*****************************************************************************
 *                        定时中断处理函数                                                              *
 *******************************************************************************/
 void TIM2_IRQHandler(void)
 {
+#if ENABLE_DYNAMIC_TIME
+	static int cnt = 0;
+	static int updatePanle = 0;
+
+	cnt++;
+	if(cnt >= 5) {
+		cnt = 0;
+
+		update_dateTime(dateTime);
+	}
+
+#endif
+
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {	//检测制定的中断是否发生
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);		//清除中断处理位	
+
+#if !ENABLE_DYNAMIC_TIME
 		ShowTemperature();
 		KeyPadProcess();
+#endif
 	}
 }
 

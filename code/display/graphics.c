@@ -414,7 +414,7 @@ int get_each_bit_num(struct timer_digital *dTime, char *buf, enum timeType type)
 	}
 
 	if(type == YEAR) {
-		buf[3] =	time / 1000;
+		buf[3] =    time / 1000;
 		buf[2] =   (time / 100) % 10;
 		buf[1] =  ((time / 10)	% 100)	% 10;
 		buf[0] = (((time / 1)	% 1000) % 100) % 10;
