@@ -738,7 +738,8 @@ int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	}
 
 	if((type==LINE_SECOND) || (type==LINE_MINUTE) || (type==LINE_HOUR)) {
-		for(j=0; j < 26; j++) {
+//		for(j=0; j < 26; j++) {
+		for(j=0; j < sz; j++) {
 			switch(lastquad) {
 			  case 1:
 				m = *(clkPanel->panCenter->cx) + (*(buf + j)).x;  // not: ->
