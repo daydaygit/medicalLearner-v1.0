@@ -709,7 +709,34 @@ int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint
 
 int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
-	int ret = 0;
+	struct dot_pos *buf = NULL;
+	int j, k, sz, len, m, n, lastquad, ret = 0;
+
+	switch(type) {
+	  case LINE_SECOND:
+		buf      = clkPanel->secHand->dots_pos;
+		sz       = clkPanel->secHand->dotPos_buf_size;
+		lastquad = clkPanel->secHand->last_quadrant;
+		break;
+	  case LINE_MINUTE:
+		buf      = clkPanel->minuHand->dots_pos;
+		sz       = clkPanel->minuHand->dotPos_buf_size;
+		lastquad = clkPanel->minuHand->last_quadrant;
+		break;
+	  case LINE_HOUR:
+		buf      = clkPanel->hourHand->dots_pos;
+		sz       = clkPanel->hourHand->dotPos_buf_size;
+		lastquad = clkPanel->hourHand->last_quadrant;
+		break;
+	}
+
+	if((type==LINE_SECOND) || (type==LINE_MINUTE) || (type==LINE_HOUR)) {
+		for(j=0; j < 26; j++) {
+			m = (buf + i)->x;
+			n = (buf + i)->y;
+		}
+		return ret;
+	}
 
 	return ret;
 }
