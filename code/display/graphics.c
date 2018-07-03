@@ -272,7 +272,17 @@ struct clk_panel_prop *get_panel_date(void)
 
 int clr_panel_dot(struct clk_panel_prop *clkPanel, u8 X, u8 Y)
 {
+	u8 ax, y1, y2;
+	u16 m;
 	int ret = 0;
+	ax = X;
+
+	y1 = (Y / 8);
+	y2 = (Y % 8);	/* 可理解成一个字节的第几个bit */
+
+	m = clkPanel->width * y1 +ax;  // line (y1+1), page-y1
+
+	*(clkPanel->dots_buf + m) |= 0 << y2;
 
 	return ret;
 }
