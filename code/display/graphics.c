@@ -270,6 +270,13 @@ struct clk_panel_prop *get_panel_date(void)
 	return &panel;
 }
 
+int clr_panel_dot(struct clk_panel_prop *clkPanel, u8 X, u8 Y)
+{
+	int ret = 0;
+
+	return ret;
+}
+
 int set_panel_dot(struct clk_panel_prop *clkPanel, u8 X, u8 Y)
 {
 	u8 ax, y1, y2;
@@ -732,8 +739,28 @@ int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 
 	if((type==LINE_SECOND) || (type==LINE_MINUTE) || (type==LINE_HOUR)) {
 		for(j=0; j < 26; j++) {
-			m = (buf + i)->x;
-			n = (buf + i)->y;
+			switch(lastquad) {
+			  case 1:
+				m = *(clkPanel->panCenter->cx) + (*(buf + j)).x;  // not: ->
+				n = *(clkPanel->panCenter->cy) - (*(buf + j)).y;
+				clr_panel_dot(clkPanel, m, n);
+				break;
+			  case 2:
+				m = *(clkPanel->panCenter->cx) - (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) - (*(buf + j)).y;
+				clr_panel_dot(clkPanel, m, n);
+				break;
+			  case 3:
+				m = *(clkPanel->panCenter->cx) - (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) + (*(buf + j)).y;
+				clr_panel_dot(clkPanel, m, n);
+				break;
+			  case 4:
+				m = *(clkPanel->panCenter->cx) + (*(buf + j)).x;
+				n = *(clkPanel->panCenter->cy) + (*(buf + j)).y;
+				clr_panel_dot(clkPanel, m, n);
+				break;
+			}
 		}
 		return ret;
 	}
