@@ -282,7 +282,8 @@ int clr_panel_dot(struct clk_panel_prop *clkPanel, u8 X, u8 Y)
 
 	m = clkPanel->width * y1 +ax;  // line (y1+1), page-y1
 
-	*(clkPanel->dots_buf + m) |= 0 << y2;
+//	*(clkPanel->dots_buf + m) |= 0 << y2;
+	*(clkPanel->dots_buf + m) &= 0 << y2;
 
 	return ret;
 }
