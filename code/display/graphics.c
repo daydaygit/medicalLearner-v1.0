@@ -728,7 +728,8 @@ int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint
 int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
 	struct dot_pos *buf = NULL;
-	struct dot_pos *buf_s = NULL;  // a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos *"
+//	struct dot_pos *buf_s = NULL;				// a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos *"
+	struct dot_pos **buf_s = NULL;				// a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos **"
 	int j, k, sz, len, m, n, lastquad, ret = 0;
 
 	switch(type) {
