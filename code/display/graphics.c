@@ -729,7 +729,8 @@ int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
 	struct dot_pos *buf = NULL;
 //	struct dot_pos *buf_s = NULL;				// a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos *"
-	struct dot_pos **buf_s = NULL;				// a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos **"
+//	struct dot_pos **buf_s = NULL;				// a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos **"
+//	struct dot_pos *buf_s[SCALE_LEN] = NULL;		// expression must be a modifiable lvalue
 	int j, k, sz, len, m, n, lastquad, ret = 0;
 
 	switch(type) {
