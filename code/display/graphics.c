@@ -728,6 +728,7 @@ int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint
 int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
 	struct dot_pos *buf = NULL;
+	struct dot_pos *buf_s = NULL;  // a value of type "struct dot_pos (*)[2]" cannot be assigned to an entity of type "struct dot_pos *"
 	int j, k, sz, len, m, n, lastquad, ret = 0;
 
 	switch(type) {
@@ -746,6 +747,35 @@ int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 		sz       = clkPanel->hourHand->dotPos_buf_size;
 		lastquad = clkPanel->hourHand->last_quadrant;
 		break;
+	  case LINE_SCALE:
+		buf_s = clkPanel->clkScale->scaleBuf;	// scaleBuffer
+		sz  = clkPanel->clkScale->size;		// size = ENDPOINT_FOR_R30
+		len = clkPanel->clkScale->len;		// len  = SCALE_LEN
+		break;
+	}
+
+	if(type == LINE_SCALE) {
+		for(j=0; j<sz; j++) {
+			for(k=0; k<len; k++) {
+				m = *(clkPanel->panCenter->cx) + (*(*(buf_s + j) + k)).x;
+				n = *(clkPanel->panCenter->cy) - (*(*(buf_s + j) + k)).y;
+				clr_panel_dot(clkPanel, m, n);
+
+				m = *(clkPanel->panCenter->cx) - (*(*(buf_s + j) + k)).x;
+				n = *(clkPanel->panCenter->cy) - (*(*(buf_s + j) + k)).y;
+				clr_panel_dot(clkPanel, m, n);
+
+				m = *(clkPanel->panCenter->cx) - (*(*(buf_s + j) + k)).x;
+				n = *(clkPanel->panCenter->cy) + (*(*(buf_s + j) + k)).y;
+				clr_panel_dot(clkPanel, m, n);
+
+				m = *(clkPanel->panCenter->cx) + (*(*(buf_s + j) + k)).x;
+				n = *(clkPanel->panCenter->cy) + (*(*(buf_s + j) + k)).y;
+				clr_panel_dot(clkPanel, m, n);
+			}
+		}
+
+		return ret;
 	}
 
 	if((type==LINE_SECOND) || (type==LINE_MINUTE) || (type==LINE_HOUR)) {
