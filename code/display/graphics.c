@@ -725,6 +725,91 @@ int line_get_endpoint_base_linetable_and_arcdate(u8 r, struct dot_pos **endpoint
 	return size;
 }
 
+int draw_single_line(struct clk_panel_prop *clkPanel, char sn, char quadr, enum LINE_TYPE hand_t)
+{
+	struct clk_scale_prop *clkscale = clkPanel->plate->clkscale;
+	struct dot_pos buf[SCALE_R] = {0}; //{0,0}; /*临时存放bresenham算法得到的值*/
+	struct dot_pos *ep_i = NULL;
+
+	int sz, cnt, i, j, k, j_s, j_e, k_s;
+	int m,n;
+	int ret = 0;
+
+	int handDiff;
+
+	sz = sizeof(endpoint_r30_on_plate) / sizeof(endpoint_r30_on_plate[0]);
+
+	ep_i = clkPanel->plate->endpoint + i;
+	clkscale->angle = 6 * i;
+
+	cnt = bresenham_algorithm_create_line_dots(clkPanel, buf, 0, 0, endpoint_r30_on_plate[sn].x, endpoint_r30_on_plate[sn].y);
+
+	switch(hand_t) {
+	  case LINE_SECOND:
+		j_s = 0;
+		k_s = 0;
+		j_e = cnt - 4;
+		break;
+
+	  case LINE_MINUTE:
+		//handDiff = 4+3;
+		if((i == 6) || (i == 7) || (i == 8))   {  handDiff = 4+2;  }
+		else                                   {  handDiff = 4+3;  }
+
+		j_s = 0;
+		k_s = 0;
+		j_e = cnt - handDiff;
+		break;
+
+	  case LINE_HOUR:
+		if((i == 6) || (i == 7) || (i == 8))   { handDiff = 4+3+2;  }
+		else                                   { handDiff = 4+3+3;  }
+
+		j_s = 0;
+		k_s = 0;
+		j_e = cnt - handDiff;
+
+		break;
+	}
+
+	for(j = j_s, k = k_s; j < j_e; j++, k++) {	// 将总长度cnt-末尾4个点即可，而不是定死为从0开始的26个。Bresenham算法直线点数是不定的
+
+		(*(*(clkscale->scaleBuf + i) + k)).x = (*(buf + j)).x;
+		(*(*(clkscale->scaleBuf + i) + k)).x = (*(buf + j)).y;
+
+		switch(quadr) {
+		  case 1:
+			/*第一象限*/
+			m = *(clkPanel->panCenter->cx) + buf[j].x;
+			n = *(clkPanel->panCenter->cy) - buf[j].y;
+			ret = set_panel_dot(clkPanel, m, n);
+			break;
+		  case 2:
+			/*第2 象限*/
+			m = *(clkPanel->panCenter->cx) - buf[j].x;
+			n = *(clkPanel->panCenter->cy) - buf[j].y;
+			ret = set_panel_dot(clkPanel, m, n);
+			break;
+		  case 3:
+			/*第3 象限*/
+			m = *(clkPanel->panCenter->cx) - buf[j].x;
+			n = *(clkPanel->panCenter->cy) + buf[j].y;
+			ret = set_panel_dot(clkPanel, m, n);
+			break;
+		  case 4:
+			/*第4 象限*/
+			m = *(clkPanel->panCenter->cx) + buf[j].x;
+			n = *(clkPanel->panCenter->cy) + buf[j].y;
+			ret = set_panel_dot(clkPanel, m, n);
+			break;
+		  default:
+			break;
+		}
+	}
+
+	return ret;
+}
+
 int clear_pan_old_data(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 {
 	struct dot_pos *buf = NULL;

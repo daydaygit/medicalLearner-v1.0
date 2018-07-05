@@ -28,6 +28,7 @@
 extern volatile char update_panel_enable;
 extern struct clk_panel_prop *get_panel_date(void);
 extern int clear_pan_old_data(struct clk_panel_prop *clkPanle, enum LINE_TYPE type);
+extern int draw_single_line(struct clk_panel_prop *clkPanle, char sn, char quadr, enum LINE_TYPE hand_t);
 #endif
 
 __IO uint8_t Function_Select = 0;
