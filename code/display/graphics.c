@@ -1554,23 +1554,51 @@ char clk_panel_init(void)
 	return ret;
 }
 
-int draw_panel_graphics(void)
+int transfer_panel_arrDate_to_LCDFormat(struct clk_panel_prop *clkPanel)
 {
-	u8 i,j;
+	u8 L=0, C=0;	/* page, line in per-page, column */
+	U8 k=0;
 	int ret = 0;
 
-	for(i=0; i<panel.width; i++) {
-		for(j=0; j<panel.height; j++) {
-			ret = 0;
-			//draw_dots(panel->dots_buf[i][j]);
+	clkPanel->height = PANEL_VERTICAL;
+	clkPanel->width  = PANEL_HORIZONTAL;
+
+	/* 20180228问题:
+	 *  1. OLED_WR_Byte(panel_64x64_data[1], 1); (第一个数据)在屏幕上木有显示，
+	 *  2. transfer_panel_arrDate_to_LCDFormat()作用是什么，在何处调用?
+	 */
+
+	while(1) {
+		for(C=0; C<8; C++) {
+			if(k >= 8)
+				break;
+
+			OLED_Set_Pos(2,k++);            // 2 ok
+			for(L=0; L<clkPanel->width; L++, j++) {
+//				OLED_WR_Byte(panel_64x64_data[j++], 1);
+				OLED_WR_Byte(*(clkPanel->dots_buf+j), 1);
+			}
 		}
 	}
 
 	return ret;
 }
 
-/*
-  * interrupt. update clock second/minute/hour hand date
-  * 定时1s时间到,则secHand中计数增1，角度增1
-  * 
-*/
+int draw_panel_graphics(void)
+{
+	u8 i,j;
+	int ret = 0;
+
+#if 0
+	for(i=0; i<panel.width; i++) {
+		for(j=0; j<panel.height; j++) {
+			ret = 0;
+			//draw_dots(panel->dots_buf[i][j]);
+		}
+	}
+#else
+	transfer_panel_arrDate_to_LCDFormat(&panel);
+#endif
+
+	return ret;
+}
