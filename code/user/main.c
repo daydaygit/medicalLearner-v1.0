@@ -89,6 +89,12 @@ int main(void)
 	OLED_Clear();
 #endif
 
+#ifdef CLK_PANEL_ENABLE
+	clk_panel_init();
+
+	draw_panel_graphics();
+#endif
+
 	SetBoardTestMode(FUNCTION_SPO2);	                    /*默认为血氧模式*/
 
 	ConfiureIoFor18b20(GPIOA, DS18B20);	                    /*配置18b20*/
