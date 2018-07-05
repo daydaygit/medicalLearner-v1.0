@@ -15,6 +15,13 @@
 
 #include "function_oem.h"
 
+#define CLK_PANLE_ENABLE    1
+#ifdef CLK_PANLE_ENABLE
+#include "graphics.h"
+
+#endif
+
+
 #define DS18B20           GPIO_Pin_7    //PA7
 
 #define BEEP              GPIO_Pin_15
@@ -24,8 +31,12 @@
 //#define KEY_PPG                GPIO_Pin_8       //GPB8
 #define KEY_SPO2          GPIO_Pin_9    //GPB9
 
-#if ENABLE_DYNAMIC_TIME
+#if CLK_PANLE_ENABLE
+extern char clk_panel_init(void);
 extern int draw_panel_graphics(void);
+
+extern int draw_panel_graphics(void);
+extern volatile unsigned int dateTime[6];
 extern volatile char update_panel_enable;
 extern struct clk_panel_prop *get_panel_date(void);
 extern int clear_pan_old_data(struct clk_panel_prop *clkPanle, enum LINE_TYPE type);
@@ -172,7 +183,7 @@ void InitKeyPad()
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 }
 
-#if ENABLE_DYNAMIC_TIME
+#if CLK_PANLE_ENABLE
 unsigned int get_max_day_for_month(unsigned int *dtime)
 {
 	unsigned int day, month, year;
@@ -341,7 +352,7 @@ int update_panel_new_data(void)
 *******************************************************************************/
 void TIM2_IRQHandler(void)
 {
-#if ENABLE_DYNAMIC_TIME
+#if CLK_PANLE_ENABLE
 	static int cnt = 0;
 	static int updatePanle = 0;
 
@@ -376,7 +387,7 @@ void TIM2_IRQHandler(void)
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {	//检测制定的中断是否发生
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);		//清除中断处理位	
 
-#if !ENABLE_DYNAMIC_TIME
+#if !CLK_PANLE_ENABLE
 		ShowTemperature();
 		KeyPadProcess();
 #endif
