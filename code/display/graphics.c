@@ -906,6 +906,9 @@ int draw_kinds_line(struct clk_panel_prop *clkPanel, enum LINE_TYPE type)
 	int t;
 	int handDiff;
 
+//	for LINE_SCALE:
+	//struct clk_scale_prop *clkscale = clkPanel->plate->clkscale;
+	struct clk_scale_prop *clkscale = NULL;
 	struct dot_pos buf[SCALE_R] = {0};              /*临时存放bresenham算法得到的值*/
 //	struct dot_pos *buf = NULL;                     /*临时存放bresenham算法得到的值*/
 

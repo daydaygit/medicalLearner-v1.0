@@ -25,10 +25,13 @@
 #define KEY_SPO2          GPIO_Pin_9    //GPB9
 
 #if ENABLE_DYNAMIC_TIME
+extern int draw_panel_graphics(void);
 extern volatile char update_panel_enable;
 extern struct clk_panel_prop *get_panel_date(void);
 extern int clear_pan_old_data(struct clk_panel_prop *clkPanle, enum LINE_TYPE type);
 extern int draw_single_line(struct clk_panel_prop *clkPanle, char sn, char quadr, enum LINE_TYPE hand_t);
+extern int digital_timer_data_init(struct timer_digital *digTime);
+extern struct timer_digital digTimer;
 #endif
 
 __IO uint8_t Function_Select = 0;
@@ -351,6 +354,13 @@ void TIM2_IRQHandler(void)
 		clear_panel_old_data();
 
 		update_panel_new_data();
+
+		//OLED_Clear();
+		draw_panel_graphics();
+
+
+//		digital_timer_data_init(dateTime);
+		digital_timer_data_init(&digTimer);
 	}
 
 
