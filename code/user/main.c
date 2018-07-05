@@ -25,6 +25,7 @@
 #define KEY_SPO2          GPIO_Pin_9    //GPB9
 
 #if ENABLE_DYNAMIC_TIME
+extern volatile char update_panel_enable;
 extern struct clk_panel_prop *get_panel_date(void);
 extern int clear_pan_old_data(struct clk_panel_prop *clkPanle, enum LINE_TYPE type);
 #endif
@@ -265,8 +266,72 @@ int clear_panel_old_data(void)
 	return ret;
 }
 
+int update_panel_new_data(void)
+{
+	struct clk_panel_prop *clkPanle = NULL;
+	char n = 0, sn = 0, tmp = 0, quadrant = 0; /* sn: 对应于endpoint_r30_on_plate的序号serialNum*/
+	int ret=0;
+	unsigned int time;
+
+	clkPanle = get_panel_date();
+	if(clkPanle == NULL)
+		return -EINVAL;
+
+#if 1
+	draw_kinds_line(clkPanle, LINE_SECOND);
+	draw_kinds_line(clkPanle, LINE_MINUTE);
+	draw_kinds_line(clkPanle, LINE_HOUR);
+#else
+	while(1) {
+		if(update_panel_enable) {
+			update_panel_enable = 0;
+
+		/*表盘数据不用更新*/
+		/*刻度数据不用更新*/
+
+		/*依据数字秒数据,更新秒针数据*/	/*要更新angle和象限*/ 	/*1s为6度*/
+		/*	quadrant = second / 15 = 0 - 第1象限
+			1 - 第4象限,关于x轴对称
+			2 - 第3象限,旋转180度
+			3 - 第2象限,关于y轴对称
+		 */
+
+		/*依据数字分数据,更新分针数据*/ /*要更新angle和象限*/
+
+		/*依据数字时数据,更新时针数据*/ /*要更新angle和象限*/
+
+		for(n = 5; n >= 3; n++) {
+#if 0
+			sn  = dateTime[n] % 15;
+			tmp = dateTime[n] / 15;
+#else
+			time = dateTime[n];
+			if(n == 3)     {	time *= 5;   }   /* hour jump 5 scale */
+
+			sn  = time % 15;
+			tmp = time / 15;
+#endif
+			switch(tmp) {
+			  case 0:	quadrant = 1;  	break; /*第1象限*/
+			  case 1:	quadrant = 4;  	break; /*第4象限*/
+			  case 2:	quadrant = 3;  	break; /*第3象限*/
+			  case 3:	quadrant = 2;  	break; /*第2象限*/
+			  default:			break;
+			}
+
+			switch(n) {
+			  case 5:	draw_single_line(clkPanle, sn, quadrant, LINE_SECOND);  break;
+			  case 4:	draw_single_line(clkPanle, sn, quadrant, LINE_MINUTE);  break;
+			  case 3:	draw_single_line(clkPanle, sn, quadrant, LINE_HOUR);	break;
+			  default:								break;
+			}
+		}
+	    }
+	}
 #endif
 
+	return ret;
+}
 /*****************************************************************************
 *                        定时中断处理函数                                                              *
 *******************************************************************************/
@@ -283,9 +348,19 @@ void TIM2_IRQHandler(void)
 		update_dateTime(dateTime);
 
 		clear_panel_old_data();
+
+		update_panel_new_data();
 	}
 
+
+	updatePanle++;
+	if(updatePanle >=20) {
+		updatePanle = 0;
+
+		update_panel_enable = 1;
+	}
 #endif
+
 
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) {	//检测制定的中断是否发生
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);		//清除中断处理位	
